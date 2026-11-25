@@ -90,3 +90,15 @@ Other fixed decisions (from the deliverables, not gaps):
 - **Problem:** the first scaffold was written before D5 was available (DAO layer, event bus, mock classes, SQLite).
 - **Resolution:** replaced completely to match D5 class-for-class on Oracle; the remaining differences are the
   gaps G1–G15 above. No pre-D5 class remains (`check-d5-conformance.py` enforces this).
+
+### S-003 · SCHEMA-CHANGE · Status: DONE (verified - no change needed)
+- **Date:** 2026-11-25
+- **Raised by:** Sufiyan
+- **Files:** src/main/resources/db/01_create_user.sql, 02_schema.sql, 03_seed.sql (unchanged)
+- **Problem:** the scripts had never run against a real Oracle database.
+- **Resolution:** ran on Oracle AI Database 26ai Free 23.26.4 for Windows (the renamed 23ai Free; service still
+  `FREEPDB1`): 01 as SYSTEM (user created, grants OK), 02 as BLMS (9 tables + 5 indexes), 03 as BLMS (1 workspace,
+  2 users, commit). No error, so `02_schema.sql` is unchanged and nobody needs to re-run anything.
+  `AppContext` boots against it; `admin/admin123` (ADMIN) and `rep/rep123` (SALES_REP) log in, a wrong password
+  gives "Incorrect username or password"; `mvn javafx:run` starts the UI.
+  Note for setup: run 01 connected to the PDB (`//localhost:1521/FREEPDB1`), not the CDB root (ORA-65096).
