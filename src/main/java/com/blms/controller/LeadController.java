@@ -5,12 +5,17 @@ import com.blms.domain.Lead;
 import com.blms.domain.PipelineMetrics;
 import com.blms.domain.PipelineStatus;
 import com.blms.domain.Session;
+import com.blms.domain.UserAccount;
 import com.blms.domain.Workspace;
 import com.blms.dto.LeadData;
 import com.blms.dto.LeadFilter;
 import com.blms.dto.LeadForm;
 import com.blms.dto.NoteForm;
+import com.blms.exception.AuthenticationException;
+import com.blms.exception.DuplicateLeadException;
+import com.blms.exception.ValidationException;
 import com.blms.persistence.LeadRepository;
+import com.blms.util.Validator;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -51,22 +56,27 @@ public class LeadController {
      * 11-12. leads.save(lead)  (Validator rejects an invalid email - UC03 extension)
      */
     public Lead saveLead(String companyName, String contactName, String email, String jobRole) {
-        // TODO(Sufiyan, UC03)
-        throw new UnsupportedOperationException("TODO UC03 saveLead");
+        UserAccount user = currentUser();
+        if (leads.existsByEmailDomain(email)) {                                        // SD03 steps 4-5
+            throw new DuplicateLeadException("This lead already exists - a lead with the email domain '"
+                    + Validator.emailDomain(email) + "' is already in the CRM");          // UC03 extension
+        }
+        Lead lead = workspace.createLead(
+                new LeadData(companyName, contactName, email, jobRole, null, null, user)); // SD03 steps 6-10
+        return leads.save(lead);                                                         // SD03 steps 11-12
     }
 
     // ------------------------------------------------------------ UC06 (SD06)
 
     /** SD06 steps 1-5: currentFilter = criteria; return leads.findByFilter(criteria). */
     public List<Lead> filterLeads(LeadFilter criteria) {
-        // TODO(Sufiyan, UC06)
-        throw new UnsupportedOperationException("TODO UC06 filterLeads");
+        currentFilter = criteria == null ? LeadFilter.all() : criteria;                 // SD06 step 2
+        return leads.findByFilter(currentFilter);                                        // SD06 steps 3-4
     }
 
     /** SD06 steps 6-9: leads.findById(leadId). */
     public Lead editLead(Long leadId) {
-        // TODO(Sufiyan, UC06)
-        throw new UnsupportedOperationException("TODO UC06 editLead");
+        return requireLead(leads.findById(requireId(leadId)));                           // SD06 steps 7-8
     }
 
     /**
@@ -74,16 +84,23 @@ public class LeadController {
      * leads.save(lead) (rolls back on failure); return leads.findByFilter(currentFilter).
      */
     public List<Lead> saveLeadChanges(Long leadId, LeadData updates, boolean archived) {
-        // TODO(Sufiyan, UC06)
-        throw new UnsupportedOperationException("TODO UC06 saveLeadChanges");
+        if (updates == null) {
+            throw new ValidationException("Lead details are required");
+        }
+        Lead lead = requireLead(leads.findById(requireId(leadId)));                    // SD06 steps 11-12
+        lead.applyUpdates(updates);                                                      // SD06 step 13
+        if (archived) {
+            lead.archive();                                                              // SD06 step 14 (opt)
+        }
+        leads.save(lead);                                       // SD06 step 15 - rolls back on failure (UC06 ext.)
+        return leads.findByFilter(currentFilter);                                        // SD06 steps 16-17
     }
 
     // ------------------------------------------------------------ UC07 (SD07)
 
     /** SD07 steps 1-2: addInteractionNote(leadId) -> noteInputForm(). */
     public NoteForm addInteractionNote(Long leadId) {
-        // TODO(Sufiyan, UC07): lead = leads.findById(leadId); return new NoteForm(leadId, lead.getCompanyName())
-        throw new UnsupportedOperationException("TODO UC07 addInteractionNote");
+        return new NoteForm(requireId(leadId), null);                                    // SD07 steps 1-2
     }
 
     /**
@@ -91,8 +108,11 @@ public class LeadController {
      * log = lead.addInteraction(note, user) (Creator); leads.save(lead); return log.
      */
     public InteractionLog submitInteraction(Long leadId, String note) {
-        // TODO(Sufiyan, UC07)
-        throw new UnsupportedOperationException("TODO UC07 submitInteraction");
+        UserAccount user = currentUser();                                                // SD07 steps 4-5
+        Lead lead = requireLead(leads.findById(requireId(leadId)));                    // SD07 steps 6-7
+        InteractionLog log = lead.addInteraction(note, user);  // SD07 steps 8-10 (empty note -> UC07 extension)
+        leads.save(lead);                                                                // SD07 step 11
+        return log;                                                                      // SD07 step 12
     }
 
     // ------------------------------------------------------------ UC08 (SD08)
@@ -102,14 +122,14 @@ public class LeadController {
      * metrics.recalculate(leads.findAll()); return metrics.
      */
     public PipelineMetrics getPipelineMetrics() {
-        // TODO(Sufiyan, UC08)
-        throw new UnsupportedOperationException("TODO UC08 getPipelineMetrics");
+        metrics.recalculate(leads.findAll());
+        return metrics;
     }
 
     /** SD08 steps 1-8: leads.findById(leadId).getStatus(). */
     public PipelineStatus selectLead(Long leadId) {
-        // TODO(Sufiyan, UC08)
-        throw new UnsupportedOperationException("TODO UC08 selectLead");
+        Lead lead = requireLead(leads.findById(requireId(leadId)));                    // SD08 steps 2-3
+        return lead.getStatus();                                                         // SD08 steps 4-7
     }
 
     /**
@@ -117,7 +137,38 @@ public class LeadController {
      * leads.save(lead); metrics.recalculate(leads.findAll()); return metrics.
      */
     public PipelineMetrics changePipelineStatus(Long leadId, PipelineStatus newStatus) {
-        // TODO(Sufiyan, UC08)
-        throw new UnsupportedOperationException("TODO UC08 changePipelineStatus");
+        if (newStatus == null) {
+            throw new ValidationException("Choose a pipeline status");
+        }
+        Lead lead = requireLead(leads.findById(requireId(leadId)));                    // SD08 steps 10-11
+        lead.changeStatus(newStatus);    // SD08 steps 12-17 (InvalidStateTransitionException = UC08 extension)
+        leads.save(lead);                                                                // SD08 step 18
+        metrics.recalculate(leads.findAll());                                            // SD08 steps 19-21
+        return metrics;                                                                  // SD08 step 22
+    }
+
+    // ------------------------------------------------------------ private helpers
+
+    /** The +session user (gap G6): the Session exists only after UC01. */
+    private UserAccount currentUser() {
+        Session current = session.get();
+        if (current == null) {
+            throw new AuthenticationException("Please log in first");
+        }
+        return current.getUser();
+    }
+
+    private static Long requireId(Long leadId) {
+        if (leadId == null) {
+            throw new ValidationException("Select a lead first");
+        }
+        return leadId;
+    }
+
+    private static Lead requireLead(Lead lead) {
+        if (lead == null) {
+            throw new ValidationException("Lead not found - it may have been removed");
+        }
+        return lead;
     }
 }
