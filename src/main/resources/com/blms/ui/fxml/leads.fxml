@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- OWNER: Ismail. fx:id / onAction names must match the view controller exactly. -->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.blms.ui.controller.LeadsViewController" spacing="12">
+    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+    <Label text="Leads" styleClass="title"/>
+    <HBox spacing="8">
+        <TextField fx:id="searchField" promptText="Search"/>
+        <TextField fx:id="industryFilter" promptText="Industry"/>
+        <ComboBox fx:id="statusFilter" promptText="Status"/>
+        <CheckBox fx:id="showArchivedCheck" text="Show archived"/>
+        <Button text="Apply Filter" onAction="#onApplyFilter"/>
+    </HBox>
+    <HBox spacing="8">
+        <Button text="Add Lead" onAction="#onAddLead" styleClass="primary"/>
+        <Button text="Edit" onAction="#onEditLead"/>
+        <Button text="Open Profile" onAction="#onOpenLead"/>
+        <Button text="Import CSV" onAction="#onImportCsv"/>
+        <Button text="Generate Drafts" onAction="#onGenerateDrafts"/>
+        <Button text="Send Emails" onAction="#onSendEmails"/>
+    </HBox>
+    <TableView fx:id="leadsTable" VBox.vgrow="ALWAYS"/>
+</VBox>

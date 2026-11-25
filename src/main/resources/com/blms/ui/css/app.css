@@ -1,0 +1,11 @@
+/* OWNER: Ismail. Single stylesheet for the whole app. */
+.root { -fx-font-family: "Segoe UI", "Helvetica Neue", sans-serif; -fx-font-size: 13px; }
+.title { -fx-font-size: 20px; -fx-font-weight: bold; }
+.hint { -fx-text-fill: #6b7280; -fx-font-size: 11px; }
+.error-label { -fx-text-fill: #b91c1c; }
+.primary { -fx-background-color: #1d4ed8; -fx-text-fill: white; }
+.sidebar { -fx-background-color: #0f172a; -fx-min-width: 200px; }
+.sidebar .button { -fx-background-color: transparent; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; }
+.sidebar-user { -fx-text-fill: #94a3b8; -fx-padding: 0 0 12 0; }
+/* UC02 extension: highlight empty/invalid fields in red */
+.field-error { -fx-border-color: #dc2626; -fx-border-width: 1.5px; }

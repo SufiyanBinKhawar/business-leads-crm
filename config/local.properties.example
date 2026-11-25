@@ -1,0 +1,8 @@
+# Copy to config/local.properties (git-ignored). Values here override src/main/resources/application.properties.
+db.url=jdbc:oracle:thin:@//localhost:1521/FREEPDB1
+db.user=blms
+db.password=blms
+security.credentialKey=put-a-long-random-secret-here
+# Leave blank for offline demo mode
+b2b.apiKey=
+llm.apiKey=

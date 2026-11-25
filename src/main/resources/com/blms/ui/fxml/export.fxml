@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- OWNER: Ismail. fx:id / onAction names must match the view controller exactly. -->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.blms.ui.controller.ExportViewController" spacing="12" prefWidth="380">
+    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+    <Label text="Export criteria"/>
+    <ComboBox fx:id="criteriaCombo" maxWidth="Infinity"/>
+    <Button text="Export" onAction="#onExport" styleClass="primary"/>
+</VBox>

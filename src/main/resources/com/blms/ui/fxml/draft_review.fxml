@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- OWNER: Ismail. fx:id / onAction names must match the view controller exactly. -->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.blms.ui.controller.DraftReviewViewController"
+      spacing="8" prefWidth="620" prefHeight="480">
+    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+    <Label fx:id="recipientLabel"/>
+    <TextField fx:id="subjectField" promptText="Subject"/>
+    <TextArea fx:id="bodyArea" wrapText="true" VBox.vgrow="ALWAYS"/>
+    <Button fx:id="approveButton" text="Approve" onAction="#onApprove" styleClass="primary"/>
+</VBox>

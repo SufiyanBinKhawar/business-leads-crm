@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- OWNER: Ismail. fx:id / onAction names must match the view controller exactly. -->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.blms.ui.controller.DashboardViewController" spacing="16">
+    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+    <Label text="Pipeline Dashboard" styleClass="title"/>
+    <FlowPane fx:id="metricsPane" hgap="12" vgap="12"/>
+    <HBox spacing="12">
+        <Button fx:id="runDiscoveryButton" text="Run API Discovery" onAction="#onRunApiDiscovery" styleClass="primary"/>
+        <ProgressIndicator fx:id="discoveryProgress" visible="false" prefWidth="24" prefHeight="24"/>
+        <Button text="Export Data" onAction="#onExportData"/>
+    </HBox>
+</VBox>

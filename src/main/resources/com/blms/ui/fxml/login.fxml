@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- OWNER: Ismail. fx:id / onAction names must match the view controller exactly. -->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.blms.ui.controller.LoginViewController"
+      styleClass="login-root" alignment="CENTER" spacing="12" prefWidth="1100" prefHeight="700">
+    <Label text="Business Leads CRM" styleClass="title"/>
+    <TextField fx:id="usernameField" promptText="Username" maxWidth="300"/>
+    <PasswordField fx:id="passwordField" promptText="Password" maxWidth="300" onAction="#onLogin"/>
+    <Button text="Login" defaultButton="true" onAction="#onLogin" styleClass="primary"/>
+    <Label fx:id="errorLabel" styleClass="error-label"/>
+    <Label text="Demo: admin / admin123  or  rep / rep123" styleClass="hint"/>
+</VBox>

@@ -1,0 +1,20 @@
+# Owners are auto-requested as reviewers when a PR touches their files (WORK_DIVISION.md section 2).
+*                                         @SufiyanBinKhawar
+
+# Ismail: UI layer
+/src/main/java/com/blms/ui/               @Muhammad-Ismail-24
+/src/main/java/com/blms/app/Launcher.java @Muhammad-Ismail-24
+/src/main/java/com/blms/app/MainApp.java  @Muhammad-Ismail-24
+/src/main/resources/com/blms/ui/          @Muhammad-Ismail-24
+
+# Contract, design and rules: both must approve
+/src/main/java/com/blms/controller/       @SufiyanBinKhawar @Muhammad-Ismail-24
+/src/main/java/com/blms/dto/              @SufiyanBinKhawar @Muhammad-Ismail-24
+/scripts/                                 @SufiyanBinKhawar @Muhammad-Ismail-24
+/docs/                                    @SufiyanBinKhawar @Muhammad-Ismail-24
+/AGENTS.md                                @SufiyanBinKhawar @Muhammad-Ismail-24
+/WORK_DIVISION.md                         @SufiyanBinKhawar @Muhammad-Ismail-24
+/CLAUDE.md                                @SufiyanBinKhawar @Muhammad-Ismail-24
+/GEMINI.md                                @SufiyanBinKhawar @Muhammad-Ismail-24
+/.cursorrules                             @SufiyanBinKhawar @Muhammad-Ismail-24
+/.github/                                 @SufiyanBinKhawar @Muhammad-Ismail-24

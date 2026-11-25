@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- OWNER: Ismail. fx:id / onAction names must match the view controller exactly. -->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.blms.ui.controller.WorkspaceSettingsViewController" spacing="8" maxWidth="520">
+    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+    <Label text="Workspace Settings" styleClass="title"/>
+    <TextField fx:id="companyNameField" promptText="Company name"/>
+    <TextField fx:id="targetIndustryField" promptText="Target industry"/>
+    <TextArea fx:id="servicesArea" promptText="Services offered" prefRowCount="3" wrapText="true"/>
+    <Label text="SMTP (Jakarta Mail)"/>
+    <TextField fx:id="smtpHostField" promptText="SMTP host"/>
+    <TextField fx:id="smtpPortField" promptText="Port (465 or 587)"/>
+    <TextField fx:id="smtpUsernameField" promptText="SMTP username"/>
+    <PasswordField fx:id="smtpPasswordField" promptText="SMTP password"/>
+    <Button text="Save" onAction="#onSave" styleClass="primary"/>
+</VBox>

@@ -1,0 +1,23 @@
+# Build
+target/
+out/
+build/
+*.class
+
+# IDE (never commit personal IDE state - causes merge conflicts)
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+*.swp
+.DS_Store
+Thumbs.db
+
+# Local runtime output
+logs/
+
+# Secrets - real keys live ONLY in config/local.properties
+config/local.properties
+.env

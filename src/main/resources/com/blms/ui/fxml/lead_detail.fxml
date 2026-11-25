@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- OWNER: Ismail. fx:id / onAction names must match the view controller exactly. -->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.blms.ui.controller.LeadDetailViewController" spacing="12">
+    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <Label fx:id="companyLabel" styleClass="title"/>
+        <ComboBox fx:id="statusCombo" onAction="#onStatusChanged"/>
+    </HBox>
+    <Label text="Interaction timeline"/>
+    <ListView fx:id="timelineList" VBox.vgrow="ALWAYS"/>
+    <Button text="Add Note" onAction="#onAddNote"/>
+    <TextArea fx:id="noteArea" promptText="Summary of the call / meeting" prefRowCount="3" wrapText="true"/>
+    <Button fx:id="submitNoteButton" text="Submit" onAction="#onSubmitNote" styleClass="primary"/>
+    <Label text="Email drafts (UC10)"/>
+    <ListView fx:id="draftsList" prefHeight="120"/>
+    <Button text="Review Draft" onAction="#onOpenDraft"/>
+</VBox>

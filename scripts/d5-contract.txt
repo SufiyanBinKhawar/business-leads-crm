@@ -1,0 +1,103 @@
+# D5 DESIGN CONTRACT - machine-readable copy of D5 Figures 1-3 (docs/deliverables/D5_Design_Class_and_Sequence_Diagrams.pdf).
+# scripts/check-d5-conformance.py compares the code against this file. CI fails on any difference.
+#
+# Format:   <package.Class> [kind] : method, method, ...
+#   kind = class | abstract | interface | enum | extends <Parent> | implements <Interface>
+#   Methods are the PUBLIC operations drawn in D5 (+). Getters/setters of drawn attributes, constructors and
+#   enum constants are not listed - they are always allowed.
+#   "!gap:Gn method" = a public method NOT in D5, approved and logged in CONFLICTS.md (update D5 before submission).
+#
+# Changing this file = changing the design. Only allowed together with a DESIGN-DEVIATION entry in CONFLICTS.md
+# that BOTH members signed, and the matching change to the D5 diagram.
+
+# ---------------- Figure 2: Authentication, Workspace and Lead Management
+controller.LoginController [class] : login
+controller.WorkspaceController [class] : openWorkspaceSettings, saveWorkspace
+controller.LeadController [class] : requestNewLeadForm, saveLead, filterLeads, editLead, saveLeadChanges, addInteractionNote, submitInteraction, selectLead, changePipelineStatus, !gap:G10 getPipelineMetrics
+security.PasswordHasher [interface] : matches
+security.BCryptPasswordHasher [implements PasswordHasher] : matches
+security.CredentialEncryptor [class] : encrypt, decrypt
+persistence.JdbcRepository [abstract] : save, findById
+persistence.UserRepository [extends JdbcRepository] : save, findByUsername, findById
+persistence.WorkspaceRepository [extends JdbcRepository] : findCurrent, save, findById
+persistence.LeadRepository [extends JdbcRepository] : existsByEmailDomain, findByFilter, findAllByIds, saveAll, findAll, save, findById
+persistence.DraftRepository [extends JdbcRepository] : findApprovedByLeadIds, save, findById
+
+# ---------------- Figure 3: Lead Ingestion, AI Outreach and Export
+controller.LeadIngestionController [class] : selectCsvFile, confirmMappingAndImport, runApiDiscovery, !gap:G1 getLastImportSummary
+controller.OutreachController [class] : generateDrafts, openDraft, approveRevisedDraft, sendApprovedEmails, !gap:G1 getLastResultCount, !gap:G1 getLastFailureCount
+controller.ExportController [class] : openExportOptions, requestExport, chooseDestination
+service.BackgroundTaskRunner [class] : submit, !gap:G1 onComplete, !infra shutdown
+service.LeadImportService [class] : importFrom
+service.DraftGenerationService [class] : generate, !gap:G1 getLastFailures
+service.OutreachDispatcher [class] : dispatch
+integration.source.LeadSource [interface] : fetchLeads
+integration.source.CsvLeadSource [implements LeadSource] : readHeaders, setColumnMap, fetchLeads
+integration.source.B2BApiLeadSource [implements LeadSource] : fetchLeads
+integration.llm.LLMClient [interface] : complete
+integration.llm.OpenAiLlmClient [implements LLMClient] : complete
+integration.mail.EmailSender [interface] : send, !gap:G3 configure
+integration.mail.JakartaMailSender [implements EmailSender] : send, !gap:G3 configure
+integration.export.Exporter [interface] : format, write
+integration.export.CsvExporter [implements Exporter] : format, write
+
+# ---------------- Figure 1: Domain Layer
+domain.Workspace [class] : updateDetails, generateIcp, createLead, setSmtpCredentials, getIcp, getSmtpCredentials, logApiCall, !load setLoadedIcp
+domain.IdealCustomerProfile [class] : toSearchQuery
+domain.ApiCallLog [class] :
+domain.UserAccount [class] : verifyPassword
+domain.Session [class] : getUser
+domain.Lead [class] : applyUpdates, archive, changeStatus, getStatus, addInteraction, createDraft, matches, !load addLoadedContact, !load addLoadedInteraction, !assoc getPrimaryContact
+domain.Contact [class] :
+domain.InteractionLog [class] :
+domain.EmailDraft [class] : revise, approve, getRecipientEmail, recordDispatch
+domain.OutreachDispatch [class] :
+domain.PipelineMetrics [class] : recalculate
+domain.UserRole [enum] :
+domain.PipelineStatus [enum] :
+domain.DraftStatus [enum] :
+domain.state.PipelineState [abstract] : getStatus, canMoveTo, next, !load forStatus
+domain.state.DiscoveredState [extends PipelineState] : getStatus, canMoveTo
+domain.state.QualifiedState [extends PipelineState] : getStatus, canMoveTo
+domain.state.ContactedState [extends PipelineState] : getStatus, canMoveTo
+domain.state.ClosedWonState [extends PipelineState] : getStatus, canMoveTo
+domain.state.ClosedLostState [extends PipelineState] : getStatus, canMoveTo
+
+# ---------------- Approved infrastructure (NOT design classes; allowed in these packages only)
+#  app.*            composition root, config, JavaFX entry point
+#  ui.*             presentation layer (View in MVC) - D5 models the business layer only
+#  dto.*            data types NAMED in D5 signatures: LoginResult, WorkspaceForm, WorkspaceResult, SmtpCredentials,
+#                   LeadForm, LeadData, LeadFilter, NoteForm, ImportSummary, ExportCriteria
+#  exception.*      BlmsException hierarchy (rubric: exception handling)
+#  util.Validator   input validation helper (rubric: input validation)
+@infra-package app ui dto exception
+@infra-class util.Validator
+@dto LoginResult WorkspaceForm WorkspaceResult SmtpCredentials LeadForm LeadData LeadFilter NoteForm ImportSummary ExportCriteria
+
+# ---------------- Attributes and association roles (D5 Fig. 1-3). Private/protected fields of these classes
+# must be exactly these. After "|" = approved non-drawn fields (CONFLICTS.md gap in brackets).
+=fields domain.Workspace : workspaceId companyName targetIndustry servicesOffered smtpHost smtpPort smtpUsername smtpCredentialEncrypted icp users leads apiLogs
+=fields domain.IdealCustomerProfile : icpId targetIndustry criteria generatedAt
+=fields domain.ApiCallLog : callId providerName operation statusCode errorMessage occurredAt
+=fields domain.UserAccount : userId username passwordHash role isActive
+=fields domain.Session : userId role startedAt user
+=fields domain.Lead : leadId companyName industry phone isArchived createdAt creator state contacts history drafts
+=fields domain.Contact : contactId fullName email jobRole phone dispatches
+=fields domain.InteractionLog : interactionId note createdAt author
+=fields domain.EmailDraft : draftId subject body status createdAt approvedAt recipient attempts | leadId(G8)
+=fields domain.OutreachDispatch : dispatchId sentAt deliveryStatus errorMessage | recipient(G8)
+=fields domain.PipelineMetrics : totalLeads discoveredCount qualifiedCount contactedCount closedWonCount closedLostCount
+=fields controller.LoginController : session hasher users
+=fields controller.LeadController : session currentFilter leads metrics workspace
+=fields controller.WorkspaceController : workspace repo encryptor
+=fields controller.LeadIngestionController : runner workspace importer | workspaces(G4) b2bApiKey(G8) csvSource(G8) lastImportSummary(G1)
+=fields controller.OutreachController : runner workspace generator dispatcher drafts leads | encryptor(G2) lastResultCount(G1) lastFailureCount(G1)
+=fields controller.ExportController : pendingRows leads exporter
+=fields service.LeadImportService : leads | session(G5)
+=fields service.DraftGenerationService : llm | lastFailures(G1)
+=fields service.OutreachDispatcher : sender
+=fields integration.source.CsvLeadSource : file columnMap
+=fields integration.source.B2BApiLeadSource : apiKey endpoint icp
+=fields integration.llm.OpenAiLlmClient : apiKey
+=fields integration.mail.JakartaMailSender : smtp
+=fields persistence.JdbcRepository : connection

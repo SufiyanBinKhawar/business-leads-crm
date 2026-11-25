@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- OWNER: Ismail. fx:id / onAction names must match the view controller exactly. -->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.blms.ui.controller.LeadFormViewController" spacing="8" prefWidth="420">
+    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+    <TextField fx:id="companyNameField" promptText="Company name"/>
+    <TextField fx:id="contactNameField" promptText="Contact name"/>
+    <TextField fx:id="emailField" promptText="Email"/>
+    <TextField fx:id="jobRoleField" promptText="Role"/>
+    <TextField fx:id="industryField" promptText="Industry"/>
+    <TextField fx:id="phoneField" promptText="Phone"/>
+    <CheckBox fx:id="archivedCheck" text="Archived"/>
+    <Label fx:id="errorLabel" styleClass="error-label"/>
+    <HBox spacing="8" alignment="CENTER_RIGHT">
+        <Button text="Cancel" cancelButton="true" onAction="#onCancel"/>
+        <Button text="Save" defaultButton="true" onAction="#onSave" styleClass="primary"/>
+    </HBox>
+</VBox>
