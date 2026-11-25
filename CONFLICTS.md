@@ -102,3 +102,21 @@ Other fixed decisions (from the deliverables, not gaps):
   `AppContext` boots against it; `admin/admin123` (ADMIN) and `rep/rep123` (SALES_REP) log in, a wrong password
   gives "Incorrect username or password"; `mvn javafx:run` starts the UI.
   Note for setup: run 01 connected to the PDB (`//localhost:1521/FREEPDB1`), not the CDB root (ORA-65096).
+
+### S-004 · CONTRACT-CHANGE · Status: OPEN
+- **Date:** 2026-11-25
+- **Raised by:** Sufiyan
+- **Files:** src/main/java/com/blms/domain/Lead.java, src/main/java/com/blms/domain/EmailDraft.java,
+  src/main/java/com/blms/persistence/LeadRepository.java, scripts/d5-contract.txt
+- **Problem:** `LeadRepository.findById` (SD06 steps 7-8) should return the lead with its `+drafts` (UC10 step 1 "clicks
+  on a lead with a 'Draft Ready' status"; I-4 `draftsList <- lead.getDrafts()`), and each draft with its `+attempts`
+  (gap G14: the lead profile shows failed send attempts). But `Lead.drafts` and `EmailDraft.attempts` are private
+  lists whose only adders create NEW objects (`Lead.createDraft`, `EmailDraft.recordDispatch`). A draft or attempt
+  read from Oracle cannot be attached, so `lead.getDrafts()` is always empty after a reload.
+- **Proposal:** two load helpers in the same style as the approved G8 ones (`addLoadedContact`,
+  `addLoadedInteraction`): `public void Lead.addLoadedDraft(EmailDraft d)` and
+  `public void EmailDraft.addLoadedAttempt(OutreachDispatch a)`; contract lines `!load addLoadedDraft` /
+  `!load addLoadedAttempt`; `LeadRepository.findById` then loads drafts (with `+recipient`) and their attempts.
+- **Diagram impact:** D5 Fig. 1 - add the two operations to Lead and EmailDraft (or list them under gap G8).
+- **Agreed by:** Sufiyan (2026-11-25), Ismail ( )
+- **Resolution:** until both sign, `findById` loads creator, contacts and history only; the drafts list stays empty.
