@@ -90,3 +90,12 @@ Other fixed decisions (from the deliverables, not gaps):
 - **Problem:** the first scaffold was written before D5 was available (DAO layer, event bus, mock classes, SQLite).
 - **Resolution:** replaced completely to match D5 class-for-class on Oracle; the remaining differences are the
   gaps G1–G15 above. No pre-D5 class remains (`check-d5-conformance.py` enforces this).
+
+### S-003 · OWNERSHIP-EXCEPTION · Status: OPEN
+- **Date:** 2026-11-25
+- **Raised by:** Sufiyan
+- **Files:** WORK_DIVISION.md §6 (shared)
+- **Problem:** the multi-day schedule no longer fits — both members are completing all tasks today with AI assistants.
+- **Proposal:** replace §6 with a same-day, four-phase schedule. Task lists, ownership and contract are unchanged.
+- **Diagram impact:** none
+- **Agreed by:** Sufiyan (2026-11-25), Ismail (pending — approve the PR)

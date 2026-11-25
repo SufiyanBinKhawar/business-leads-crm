@@ -131,15 +131,18 @@ Before the demo, walk each other through the code and the sequence diagram of ev
 
 ---
 
-## 6. Schedule (demos start week of 30 Nov 2026)
+## 6. Schedule — everything today (Wed 25 Nov), demos from Mon 30 Nov
 
-| When | Ismail | Sufiyan | Evening sync — must work on BOTH laptops |
+Both of us work with AI assistants in parallel. The contract (§3) is already fixed, so neither side waits
+for the other: the UI is built against the signatures while the bodies are filled in.
+
+| Phase | Sufiyan's AI (business layer + DB) | Ismail's AI (UI) | Merge checkpoint — must work on BOTH laptops |
 |---|---|---|---|
-| **Wed 25 Nov** | Oracle + clone + run | Oracle + scaffold pushed | Both log in as `admin` |
-| **Thu 26 Nov** | I-1, I-2, I-3 | S-1, S-2 | UC03, UC06 |
-| **Fri 27 Nov** | I-4, I-5 | S-3, S-4 | UC04, UC07, UC08 |
-| **Sat 28 Nov** | I-6, I-7, I-8 | S-5, S-6 | UC02, UC05, UC09, UC10 |
-| **Sun 29 Nov** | I-9, I-10, I-11 | S-7, S-8 | **Full UC01–UC12 run-through** |
-| **Mon 30 Nov** | bug fixes only | S-9, bug fixes only | **Code freeze**, rehearse demo + design questions |
+| **0** | Oracle set up, scripts run | Oracle set up, clone, run | Both log in as `admin` |
+| **1** | S-1, S-2, S-3 | I-1, I-2, I-3, I-4 | UC01, UC03, UC06, UC07, UC08 |
+| **2** | S-4, S-5 | I-5, I-6, I-7 | UC02, UC04, UC05 |
+| **3** | S-6, S-7 | I-8, I-9, I-10 | UC09, UC10, UC11, UC12 |
+| **4** | S-8, S-9 | I-11 | **Full UC01–UC12 run-through**, then code freeze |
+| **Before the demo** | Explain the design (§5 split) | Explain the design (§5 split) | Rehearse with `docs/DESIGN_TRACEABILITY.md` §3 |
 
-If either of us falls behind, raise it at the evening sync — never silently take over the other's files.
+Each phase ends with a pull request per member and a merge into `main` after CI is green.
