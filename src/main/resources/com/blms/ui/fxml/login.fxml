@@ -1,14 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- OWNER: Ismail. fx:id / onAction names must match the view controller exactly. -->
+<!-- OWNER: Ismail. fx:id / onAction names must match LoginViewController exactly. -->
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.blms.ui.controller.LoginViewController"
-      styleClass="login-root" alignment="CENTER" spacing="12" prefWidth="1100" prefHeight="700">
-    <Label text="Business Leads CRM" styleClass="title"/>
-    <TextField fx:id="usernameField" promptText="Username" maxWidth="300"/>
-    <PasswordField fx:id="passwordField" promptText="Password" maxWidth="300" onAction="#onLogin"/>
-    <Button text="Login" defaultButton="true" onAction="#onLogin" styleClass="primary"/>
-    <Label fx:id="errorLabel" styleClass="error-label"/>
-    <Label text="Demo: admin / admin123  or  rep / rep123" styleClass="hint"/>
-</VBox>
+
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.blms.ui.controller.LoginViewController"
+           styleClass="login-root"
+           prefWidth="1100" prefHeight="700">
+    <VBox alignment="CENTER" maxWidth="420" spacing="20">
+        <VBox styleClass="login-card" spacing="16">
+            <VBox spacing="4" alignment="CENTER_LEFT">
+                <Label text="Business Leads CRM" styleClass="title"/>
+                <Label text="Sign in to your sales workspace" styleClass="subtitle"/>
+            </VBox>
+
+            <VBox spacing="6">
+                <Label text="Username" styleClass="hint"/>
+                <TextField fx:id="usernameField" promptText="Enter your username" onAction="#onLogin"/>
+            </VBox>
+
+            <VBox spacing="6">
+                <Label text="Password" styleClass="hint"/>
+                <PasswordField fx:id="passwordField" promptText="Enter your password" onAction="#onLogin"/>
+            </VBox>
+
+            <Label fx:id="errorLabel" styleClass="error-label" wrapText="true" minHeight="18"/>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Button fx:id="loginButton" text="Sign In" defaultButton="true" onAction="#onLogin" styleClass="primary-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <ProgressIndicator fx:id="loginProgress" visible="false" prefWidth="20" prefHeight="20"/>
+            </HBox>
+
+            <Separator/>
+
+            <VBox spacing="4">
+                <Label text="Demo Credentials:" styleClass="hint"/>
+                <Label text="• Admin: admin / admin123" styleClass="hint"/>
+                <Label text="• Sales Rep: rep / rep123" styleClass="hint"/>
+            </VBox>
+        </VBox>
+    </VBox>
+</StackPane>

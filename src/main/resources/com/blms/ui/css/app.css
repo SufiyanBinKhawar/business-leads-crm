@@ -1,11 +1,291 @@
-/* OWNER: Ismail. Single stylesheet for the whole app. */
-.root { -fx-font-family: "Segoe UI", "Helvetica Neue", sans-serif; -fx-font-size: 13px; }
-.title { -fx-font-size: 20px; -fx-font-weight: bold; }
-.hint { -fx-text-fill: #6b7280; -fx-font-size: 11px; }
-.error-label { -fx-text-fill: #b91c1c; }
-.primary { -fx-background-color: #1d4ed8; -fx-text-fill: white; }
-.sidebar { -fx-background-color: #0f172a; -fx-min-width: 200px; }
-.sidebar .button { -fx-background-color: transparent; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; }
-.sidebar-user { -fx-text-fill: #94a3b8; -fx-padding: 0 0 12 0; }
-/* UC02 extension: highlight empty/invalid fields in red */
-.field-error { -fx-border-color: #dc2626; -fx-border-width: 1.5px; }
+/* OWNER: Ismail. Single stylesheet for the BLMS application. */
+
+.root {
+    -fx-font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
+    -fx-font-size: 13px;
+    -fx-background-color: #f8fafc;
+}
+
+/* Typography */
+.title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0f172a;
+}
+
+.subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748b;
+}
+
+.section-header {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+}
+
+.hint {
+    -fx-text-fill: #64748b;
+    -fx-font-size: 12px;
+}
+
+.error-label {
+    -fx-text-fill: #dc2626;
+    -fx-font-size: 12px;
+    -fx-font-weight: normal;
+}
+
+/* Base Buttons */
+.button {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cbd5e1;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-text-fill: #1e293b;
+    -fx-padding: 7px 14px;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #f1f5f9;
+    -fx-border-color: #94a3b8;
+}
+
+.button:pressed {
+    -fx-background-color: #e2e8f0;
+}
+
+.button:disabled {
+    -fx-opacity: 0.5;
+}
+
+/* Primary Button (.primary-button and alias .primary) */
+.primary-button, .primary {
+    -fx-background-color: #2563eb;
+    -fx-border-color: #1d4ed8;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 16px;
+}
+
+.primary-button:hover, .primary:hover {
+    -fx-background-color: #1d4ed8;
+    -fx-border-color: #1e40af;
+}
+
+.primary-button:pressed, .primary:pressed {
+    -fx-background-color: #1e40af;
+}
+
+/* Input Fields */
+.text-field, .password-field, .text-area, .combo-box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cbd5e1;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 7px 10px;
+    -fx-text-fill: #0f172a;
+}
+
+.text-field:focused, .password-field:focused, .text-area:focused, .combo-box:focused {
+    -fx-border-color: #2563eb;
+    -fx-background-color: #ffffff;
+}
+
+/* Validation Highlights */
+.field-error {
+    -fx-border-color: #dc2626;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+}
+
+/* Cards & Containers */
+.card {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 20px;
+}
+
+.card-header {
+    -fx-padding: 0 0 8px 0;
+    -fx-border-color: transparent transparent #f1f5f9 transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.metric-card {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 16px 20px;
+    -fx-min-width: 140px;
+}
+
+.metric-value {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2563eb;
+}
+
+.metric-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #64748b;
+}
+
+.placeholder-badge {
+    -fx-background-color: #f1f5f9;
+    -fx-border-color: #cbd5e1;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: 4px 8px;
+    -fx-text-fill: #475569;
+    -fx-font-size: 11px;
+}
+
+/* Login Screen Layout */
+.login-root {
+    -fx-background-color: #f1f5f9;
+}
+
+.login-card {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cbd5e1;
+    -fx-border-width: 1px;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-padding: 36px 32px;
+    -fx-effect: dropshadow(three-pass-box, rgba(15, 23, 42, 0.08), 16, 0, 0, 4);
+}
+
+/* Sidebar & Navigation */
+.sidebar {
+    -fx-background-color: #0f172a;
+    -fx-min-width: 220px;
+    -fx-pref-width: 220px;
+}
+
+.sidebar-brand {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #f8fafc;
+    -fx-padding: 4px 8px 0 8px;
+}
+
+.sidebar-user {
+    -fx-font-size: 12px;
+    -fx-text-fill: #94a3b8;
+    -fx-padding: 0 8px 12px 8px;
+}
+
+.sidebar-divider {
+    -fx-background-color: #1e293b;
+    -fx-padding: 0;
+}
+
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: #cbd5e1;
+    -fx-alignment: CENTER_LEFT;
+    -fx-font-size: 13px;
+    -fx-padding: 10px 14px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+}
+
+.nav-button:hover {
+    -fx-background-color: #1e293b;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: transparent;
+}
+
+.nav-button:pressed {
+    -fx-background-color: #334155;
+}
+
+.nav-button.active {
+    -fx-background-color: #2563eb;
+    -fx-text-fill: #ffffff;
+}
+
+.logout-button {
+    -fx-text-fill: #f87171;
+}
+
+.logout-button:hover {
+    -fx-background-color: #1e293b;
+    -fx-text-fill: #fca5a5;
+}
+
+/* Main Content Area */
+.content-area {
+    -fx-background-color: #f8fafc;
+    -fx-padding: 24px;
+}
+
+/* TableView & Rows */
+.table-view {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #f8fafc;
+}
+
+.table-view .column-header {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: transparent transparent #e2e8f0 transparent;
+    -fx-font-weight: bold;
+    -fx-text-fill: #475569;
+    -fx-padding: 6px 8px;
+}
+
+.table-row-cell {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent #f1f5f9 transparent;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #fafbfd;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #f1f5f9;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #dbeafe;
+}
+
+.table-row-cell:selected .text {
+    -fx-fill: #1e3a8a;
+}
+
+/* Task I-2 Requirement 7: Archived row greyed look */
+.table-row-cell.row-archived {
+    -fx-opacity: 0.65;
+}
+
+.table-row-cell.row-archived .text {
+    -fx-fill: #94a3b8;
+    -fx-font-style: italic;
+}
+
+.table-row-cell.row-archived:selected {
+    -fx-background-color: #e2e8f0;
+}
