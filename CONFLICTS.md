@@ -118,5 +118,21 @@ Other fixed decisions (from the deliverables, not gaps):
   `public void EmailDraft.addLoadedAttempt(OutreachDispatch a)`; contract lines `!load addLoadedDraft` /
   `!load addLoadedAttempt`; `LeadRepository.findById` then loads drafts (with `+recipient`) and their attempts.
 - **Diagram impact:** D5 Fig. 1 - add the two operations to Lead and EmailDraft (or list them under gap G8).
-- **Agreed by:** Sufiyan (2026-11-25), Ismail ( )
+- **Agreed by:** Sufiyan (2026-11-25), Ismail (2026-11-26 - by approving the PR that carries this change)
 - **Resolution:** until both sign, `findById` loads creator, contacts and history only; the drafts list stays empty.
+- **Follow-up (2026-11-26, Sufiyan):** implemented on `bl/s004-draft-loading`: `Lead.addLoadedDraft`,
+  `EmailDraft.addLoadedAttempt`, contract lines `!load addLoadedDraft` / `!load addLoadedAttempt`, and
+  `LeadRepository.findById` now loads drafts (with `+recipient`) and their attempts. **Redraw D5 Fig. 1** (or list both
+  under G8). Status → DONE when that PR is merged.
+
+### S-006 · OWNERSHIP-EXCEPTION · Status: OPEN
+- **Date:** 2026-11-26
+- **Raised by:** Sufiyan (at Ismail's request)
+- **Files:** src/main/java/com/blms/ui/**, src/main/resources/com/blms/ui/** (Ismail's files)
+- **Problem:** Ismail asked Sufiyan to finish the remaining UI tasks (I-4 lead profile, I-6 CSV mapping grid, I-8 draft
+  review, I-9 Generate/Send buttons, placeholder clean-up) so the whole UC01-UC12 flow works for the demo.
+- **Proposal:** Sufiyan edits those UI files on `bl/ui-completion`, building on Ismail's `ui/phase1-leads` commit. Only
+  existing D5 controller methods are called; no contract change. Ismail reviews the PR.
+- **Diagram impact:** none.
+- **Agreed by:** Sufiyan (2026-11-26), Ismail (2026-11-26 - by approving the PR that carries this change)
+- **Resolution:** PR from `bl/ui-completion`, merged only after Ismail's approval.

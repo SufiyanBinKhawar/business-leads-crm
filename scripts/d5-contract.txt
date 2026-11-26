@@ -47,10 +47,10 @@ domain.IdealCustomerProfile [class] : toSearchQuery
 domain.ApiCallLog [class] :
 domain.UserAccount [class] : verifyPassword
 domain.Session [class] : getUser
-domain.Lead [class] : applyUpdates, archive, changeStatus, getStatus, addInteraction, createDraft, matches, !load addLoadedContact, !load addLoadedInteraction, !assoc getPrimaryContact
+domain.Lead [class] : applyUpdates, archive, changeStatus, getStatus, addInteraction, createDraft, matches, !load addLoadedContact, !load addLoadedInteraction, !load addLoadedDraft, !assoc getPrimaryContact
 domain.Contact [class] :
 domain.InteractionLog [class] :
-domain.EmailDraft [class] : revise, approve, getRecipientEmail, recordDispatch
+domain.EmailDraft [class] : revise, approve, getRecipientEmail, recordDispatch, !load addLoadedAttempt
 domain.OutreachDispatch [class] :
 domain.PipelineMetrics [class] : recalculate
 domain.UserRole [enum] :
