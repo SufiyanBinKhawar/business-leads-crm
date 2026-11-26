@@ -67,6 +67,12 @@ public abstract class JdbcRepository<T> {
      * "Database timeout: System rolls back the change"). Every SQLException becomes DataAccessException.
      */
     protected <R> R inTransaction(SqlWork<R> work) {
+        synchronized (connection) {   // one shared Connection: background jobs (UC05/09/11) must not interleave
+            return runInTransaction(work);
+        }
+    }
+
+    private <R> R runInTransaction(SqlWork<R> work) {
         try {
             connection.setAutoCommit(false);
             try {
@@ -86,10 +92,12 @@ public abstract class JdbcRepository<T> {
 
     /** Read-only query wrapper: SQLException -> DataAccessException. */
     protected <R> R query(SqlWork<R> work) {
-        try {
-            return work.run();
-        } catch (SQLException e) {
-            throw new DataAccessException("Unable to connect to database", e);
+        synchronized (connection) {
+            try {
+                return work.run();
+            } catch (SQLException e) {
+                throw new DataAccessException("Unable to connect to database", e);
+            }
         }
     }
 

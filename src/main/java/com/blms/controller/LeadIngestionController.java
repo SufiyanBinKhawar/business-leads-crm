@@ -3,6 +3,9 @@ package com.blms.controller;
 import com.blms.domain.IdealCustomerProfile;
 import com.blms.domain.Workspace;
 import com.blms.dto.ImportSummary;
+import com.blms.exception.DataAccessException;
+import com.blms.exception.IntegrationException;
+import com.blms.exception.ValidationException;
 import com.blms.integration.source.B2BApiLeadSource;
 import com.blms.integration.source.CsvLeadSource;
 import com.blms.integration.source.LeadSource;
@@ -12,6 +15,8 @@ import com.blms.service.LeadImportService;
 
 import java.io.File;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * D5 Figure 3 «Controller» LeadIngestionController - UC04 Import Leads via CSV (SD04), UC05 Discover Leads via
@@ -27,7 +32,12 @@ public class LeadIngestionController {
     private final WorkspaceRepository workspaces;
     private final String b2bApiKey;
     private CsvLeadSource csvSource;
-    private ImportSummary lastImportSummary;
+    /** Written by the worker thread (UC05), read by the JavaFX thread - hence volatile. */
+    private volatile ImportSummary lastImportSummary;
+
+    private static final String PROVIDER = "Apollo";
+    private static final String OPERATION = "GET /people/search";
+    private static final Pattern HTTP_STATUS = Pattern.compile("HTTP (\\d{3})");
 
     public LeadIngestionController(BackgroundTaskRunner runner, Workspace workspace, LeadImportService importer,
                                    WorkspaceRepository workspaces, String b2bApiKey) {
@@ -49,8 +59,12 @@ public class LeadIngestionController {
      * Synchronous in D5; the UI calls it inside a JavaFX Task to honour UC04's background-thread requirement (gap G7).
      */
     public ImportSummary confirmMappingAndImport(Map<String, String> columnMap) {
-        // TODO(Sufiyan, UC04): csvSource.setColumnMap(columnMap); lastImportSummary = importer.importFrom(csvSource, workspace)
-        throw new UnsupportedOperationException("TODO UC04 confirmMappingAndImport");
+        if (csvSource == null) {
+            throw new ValidationException("Choose a CSV file first");
+        }
+        csvSource.setColumnMap(columnMap);                                     // SD04 step 7
+        lastImportSummary = importer.importFrom(csvSource, workspace);         // SD04 steps 8-17
+        return lastImportSummary;                                               // SD04 step 18
     }
 
     /**
@@ -59,9 +73,13 @@ public class LeadIngestionController {
      * src = new B2BApiLeadSource(b2bApiKey, icp); return runner.submit(() -> runDiscovery(src)).
      */
     public Long runApiDiscovery() {
-        IdealCustomerProfile icp = workspace.getIcp();
-        // TODO(Sufiyan, UC05)
-        throw new UnsupportedOperationException("TODO UC05 runApiDiscovery");
+        IdealCustomerProfile icp = workspace.getIcp();                         // SD05 steps 2-3
+        if (icp == null) {                                                     // D3 UC05 precondition
+            throw new ValidationException("Configure the workspace first - no Ideal Customer Profile has been "
+                    + "generated yet (Workspace Settings)");
+        }
+        B2BApiLeadSource src = new B2BApiLeadSource(b2bApiKey, icp);           // SD05 step 4 «create»
+        return runner.submit(() -> runDiscovery(src));                         // SD05 steps 5-7
     }
 
     /**
@@ -70,8 +88,26 @@ public class LeadIngestionController {
      * On IntegrationException: logApiCall with the error code/message, save, rethrow (UC05 extensions).
      */
     private void runDiscovery(LeadSource source) {
-        // TODO(Sufiyan, UC05)
-        throw new UnsupportedOperationException("TODO UC05 runDiscovery");
+        String provider = b2bApiKey == null || b2bApiKey.isBlank() ? PROVIDER + " (offline demo)" : PROVIDER;
+        try {
+            lastImportSummary = importer.importFrom(source, workspace);       // SD05 steps 9-22
+            workspace.logApiCall(provider, OPERATION, 200, null);              // SD05 steps 23-25
+            workspaces.save(workspace);                                        // gap G4: persist the ApiCallLog
+        } catch (IntegrationException e) {                                     // UC05 extensions (429 / timeout)
+            workspace.logApiCall(provider, OPERATION, httpStatusOf(e.getMessage()), e.getMessage());
+            try {
+                workspaces.save(workspace);
+            } catch (DataAccessException saveFailure) {
+                e.addSuppressed(saveFailure);
+            }
+            throw e;
+        }
+    }
+
+    /** "... (HTTP 429) ..." -> 429; 0 when the call never got an HTTP answer (timeout, no network). */
+    private static int httpStatusOf(String message) {
+        Matcher m = HTTP_STATUS.matcher(message == null ? "" : message);
+        return m.find() ? Integer.parseInt(m.group(1)) : 0;
     }
 
     /** NOT IN D5 - approved addition (gap G1): result for importSummary / discoveryCompleted(newLeadCount, ids). */
