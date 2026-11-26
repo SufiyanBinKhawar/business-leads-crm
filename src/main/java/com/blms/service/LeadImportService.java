@@ -5,6 +5,7 @@ import com.blms.domain.Session;
 import com.blms.domain.Workspace;
 import com.blms.dto.ImportSummary;
 import com.blms.dto.LeadData;
+import com.blms.exception.AuthenticationException;
 import com.blms.integration.source.LeadSource;
 import com.blms.persistence.LeadRepository;
 import com.blms.util.Validator;
@@ -33,6 +34,10 @@ public class LeadImportService {
 
     /** SD04 steps 8-17 / SD05 steps 9-22. */
     public ImportSummary importFrom(LeadSource source, Workspace ws) {
+        Session current = session.get();
+        if (current == null) {
+            throw new AuthenticationException("Please log in first");
+        }
         List<Lead> newLeads = new ArrayList<>();
         Set<String> domainsInThisRun = new HashSet<>();
         int duplicates = 0;
@@ -47,7 +52,7 @@ public class LeadImportService {
                 duplicates++;
                 continue;
             }
-            newLeads.add(ws.createLead(row.withCreator(session.get().getUser())));
+            newLeads.add(ws.createLead(row.withCreator(current.getUser())));
         }
         int imported = newLeads.isEmpty() ? 0 : leads.saveAll(newLeads);
         List<Long> ids = newLeads.stream().map(Lead::getLeadId).toList();

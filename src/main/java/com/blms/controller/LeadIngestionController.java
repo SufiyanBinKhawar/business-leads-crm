@@ -3,6 +3,7 @@ package com.blms.controller;
 import com.blms.domain.IdealCustomerProfile;
 import com.blms.domain.Workspace;
 import com.blms.dto.ImportSummary;
+import com.blms.exception.ValidationException;
 import com.blms.integration.source.B2BApiLeadSource;
 import com.blms.integration.source.CsvLeadSource;
 import com.blms.integration.source.LeadSource;
@@ -49,8 +50,12 @@ public class LeadIngestionController {
      * Synchronous in D5; the UI calls it inside a JavaFX Task to honour UC04's background-thread requirement (gap G7).
      */
     public ImportSummary confirmMappingAndImport(Map<String, String> columnMap) {
-        // TODO(Sufiyan, UC04): csvSource.setColumnMap(columnMap); lastImportSummary = importer.importFrom(csvSource, workspace)
-        throw new UnsupportedOperationException("TODO UC04 confirmMappingAndImport");
+        if (csvSource == null) {
+            throw new ValidationException("Choose a CSV file first");
+        }
+        csvSource.setColumnMap(columnMap);                                     // SD04 step 7
+        lastImportSummary = importer.importFrom(csvSource, workspace);         // SD04 steps 8-17
+        return lastImportSummary;                                               // SD04 step 18
     }
 
     /**
