@@ -1,25 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- OWNER: Ismail. fx:id / onAction names must match the view controller exactly. -->
+<!-- OWNER: Ismail. fx:id / onAction names must match LeadsViewController exactly. -->
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.blms.ui.controller.LeadsViewController" spacing="12">
-    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
-    <Label text="Leads" styleClass="title"/>
-    <HBox spacing="8">
-        <TextField fx:id="searchField" promptText="Search"/>
-        <TextField fx:id="industryFilter" promptText="Industry"/>
-        <ComboBox fx:id="statusFilter" promptText="Status"/>
-        <CheckBox fx:id="showArchivedCheck" text="Show archived"/>
-        <Button text="Apply Filter" onAction="#onApplyFilter"/>
-    </HBox>
-    <HBox spacing="8">
-        <Button text="Add Lead" onAction="#onAddLead" styleClass="primary"/>
-        <Button text="Edit" onAction="#onEditLead"/>
-        <Button text="Open Profile" onAction="#onOpenLead"/>
-        <Button text="Import CSV" onAction="#onImportCsv"/>
-        <Button text="Generate Drafts" onAction="#onGenerateDrafts"/>
-        <Button text="Send Emails" onAction="#onSendEmails"/>
-    </HBox>
-    <TableView fx:id="leadsTable" VBox.vgrow="ALWAYS"/>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.blms.ui.controller.LeadsViewController"
+      spacing="16">
+    <padding><Insets top="20" right="24" bottom="20" left="24"/></padding>
+
+    <VBox spacing="4">
+        <Label text="Lead Pipeline Management" styleClass="title"/>
+        <Label text="Search, filter, track and trigger outreach for prospects across pipeline stages" styleClass="subtitle"/>
+    </VBox>
+
+    <VBox styleClass="card" spacing="14">
+        <!-- Filter Bar -->
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <TextField fx:id="searchField" promptText="Search keyword / name..." HBox.hgrow="ALWAYS" onAction="#onApplyFilter"/>
+            <TextField fx:id="industryFilter" promptText="Industry" prefWidth="150" onAction="#onApplyFilter"/>
+            <ComboBox fx:id="statusFilter" prefWidth="140"/>
+            <CheckBox fx:id="showArchivedCheck" text="Show archived" onAction="#onApplyFilter"/>
+            <Button fx:id="applyFilterButton" text="Apply" onAction="#onApplyFilter" styleClass="primary-button"/>
+            <Button fx:id="clearFilterButton" text="Clear" onAction="#onClearFilter"/>
+            <ProgressIndicator fx:id="loadingIndicator" visible="false" prefWidth="20" prefHeight="20"/>
+        </HBox>
+
+        <Separator/>
+
+        <!-- Action Toolbar -->
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Button fx:id="addLeadButton" text="Add Lead" onAction="#onAddLead" styleClass="primary-button"/>
+            <Button fx:id="editLeadButton" text="Edit Lead" onAction="#onEditLead"/>
+            <Separator orientation="VERTICAL"/>
+            <Button fx:id="generateDraftsButton" text="Generate Drafts" onAction="#onGenerateDrafts"/>
+            <Button fx:id="sendEmailsButton" text="Send Emails" onAction="#onSendEmails"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="selectionCountLabel" styleClass="hint"/>
+        </HBox>
+
+        <!-- Leads Table -->
+        <TableView fx:id="leadsTable" VBox.vgrow="ALWAYS" prefHeight="450"/>
+    </VBox>
 </VBox>

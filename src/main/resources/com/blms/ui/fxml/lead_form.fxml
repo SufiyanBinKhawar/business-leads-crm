@@ -1,20 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- OWNER: Ismail. fx:id / onAction names must match the view controller exactly. -->
+<!-- OWNER: Ismail. fx:id / onAction names must match LeadFormViewController exactly. -->
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.blms.ui.controller.LeadFormViewController" spacing="8" prefWidth="420">
-    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
-    <TextField fx:id="companyNameField" promptText="Company name"/>
-    <TextField fx:id="contactNameField" promptText="Contact name"/>
-    <TextField fx:id="emailField" promptText="Email"/>
-    <TextField fx:id="jobRoleField" promptText="Role"/>
-    <TextField fx:id="industryField" promptText="Industry"/>
-    <TextField fx:id="phoneField" promptText="Phone"/>
-    <CheckBox fx:id="archivedCheck" text="Archived"/>
-    <Label fx:id="errorLabel" styleClass="error-label"/>
-    <HBox spacing="8" alignment="CENTER_RIGHT">
-        <Button text="Cancel" cancelButton="true" onAction="#onCancel"/>
-        <Button text="Save" defaultButton="true" onAction="#onSave" styleClass="primary"/>
-    </HBox>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.blms.ui.controller.LeadFormViewController"
+      spacing="14" prefWidth="480">
+    <padding><Insets top="20" right="24" bottom="20" left="24"/></padding>
+
+    <VBox spacing="4">
+        <Label fx:id="formTitleLabel" text="Lead Details" styleClass="title"/>
+        <Label fx:id="formSubtitleLabel" text="Enter lead profile and primary contact information" styleClass="subtitle"/>
+    </VBox>
+
+    <VBox styleClass="card" spacing="12">
+        <Label text="Company Information" styleClass="section-header"/>
+        <VBox spacing="4">
+            <Label text="Company Name *" styleClass="hint"/>
+            <TextField fx:id="companyNameField" promptText="Registered company name"/>
+        </VBox>
+
+        <VBox fx:id="industryBox" spacing="4">
+            <Label text="Industry" styleClass="hint"/>
+            <TextField fx:id="industryField" promptText="e.g. Technology, Healthcare, Manufacturing"/>
+        </VBox>
+
+        <Separator/>
+
+        <Label text="Primary Prospect Contact" styleClass="section-header"/>
+        <GridPane hgap="12" vgap="10">
+            <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                <Label text="Contact Name *" styleClass="hint"/>
+                <TextField fx:id="contactNameField" promptText="Full name"/>
+            </VBox>
+            <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                <Label text="Email Address *" styleClass="hint"/>
+                <TextField fx:id="emailField" promptText="name@company.com"/>
+            </VBox>
+            <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                <Label text="Job Role" styleClass="hint"/>
+                <TextField fx:id="jobRoleField" promptText="e.g. VP of Sales, CTO"/>
+            </VBox>
+            <VBox fx:id="phoneBox" spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                <Label text="Direct Phone" styleClass="hint"/>
+                <TextField fx:id="phoneField" promptText="+1 555-0199"/>
+            </VBox>
+        </GridPane>
+
+        <VBox fx:id="archivedBox" spacing="4">
+            <Separator/>
+            <CheckBox fx:id="archivedCheck" text="Archived (soft-deleted lead)"/>
+        </VBox>
+
+        <Label fx:id="errorLabel" styleClass="error-label" wrapText="true" minHeight="18"/>
+
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <ProgressIndicator fx:id="saveProgress" visible="false" prefWidth="20" prefHeight="20"/>
+            <Button fx:id="cancelButton" text="Cancel" cancelButton="true" onAction="#onCancel"/>
+            <Button fx:id="saveButton" text="Save Lead" defaultButton="true" onAction="#onSave" styleClass="primary-button"/>
+        </HBox>
+    </VBox>
 </VBox>
