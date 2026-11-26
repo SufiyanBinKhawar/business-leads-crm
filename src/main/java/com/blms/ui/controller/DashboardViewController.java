@@ -6,6 +6,8 @@ import com.blms.controller.LeadIngestionController;
 import com.blms.domain.PipelineMetrics;
 import com.blms.ui.navigation.SceneManager;
 import com.blms.ui.navigation.View;
+import com.blms.dto.ImportSummary;
+import com.blms.exception.BlmsException;
 import com.blms.ui.util.AlertHelper;
 import com.blms.ui.util.FxAsync;
 import javafx.fxml.FXML;
@@ -32,7 +34,7 @@ public class DashboardViewController {
         refreshMetrics();
     }
 
-    /** Render leadController.getPipelineMetrics() getters as cards (UC08 step 5). Fallback to placeholder if backend is not yet implemented. */
+    /** Render leadController.getPipelineMetrics() getters as cards (UC08 step 5, gap G10). */
     @FXML
     private void refreshMetrics() {
         metricsPane.getChildren().clear();
@@ -46,16 +48,8 @@ public class DashboardViewController {
                     createCard("Closed Won", String.valueOf(metrics.getClosedWonCount())),
                     createCard("Closed Lost", String.valueOf(metrics.getClosedLostCount()))
             );
-        } catch (UnsupportedOperationException e) {
-            // Placeholder view while Sufiyan implements UC08 getPipelineMetrics
-            metricsPane.getChildren().addAll(
-                    createCard("Total Leads", "—"),
-                    createCard("Discovered", "—"),
-                    createCard("Qualified", "—"),
-                    createCard("Contacted", "—"),
-                    createCard("Closed Won", "—"),
-                    createCard("Closed Lost", "—")
-            );
+        } catch (BlmsException e) {
+            AlertHelper.error(e);
         }
     }
 
@@ -80,15 +74,17 @@ public class DashboardViewController {
             FxAsync.onComplete(jobId, () -> {
                 discoveryProgress.setVisible(false);
                 runDiscoveryButton.setDisable(false);
-                AlertHelper.info("API Discovery", "Discovery completed successfully.");
+                ImportSummary s = leadIngestionController.getLastImportSummary();
+                AlertHelper.info("API Discovery completed", s.imported() + " new lead(s) saved, " + s.duplicates()
+                        + " already in the CRM, " + s.invalid() + " skipped (missing contact data).");
                 refreshMetrics();
             }, error -> {
                 discoveryProgress.setVisible(false);
                 runDiscoveryButton.setDisable(false);
-                AlertHelper.error(error);
+                AlertHelper.error(error);              // UC05: HTTP 429 / network timeout messages
             });
-        } catch (UnsupportedOperationException e) {
-            AlertHelper.info("API Discovery (UC05)", "B2B API Lead Discovery is under active development by Sufiyan.");
+        } catch (BlmsException e) {
+            AlertHelper.error(e);                      // e.g. workspace not configured (no ICP)
         }
     }
 

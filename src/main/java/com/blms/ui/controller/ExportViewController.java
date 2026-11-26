@@ -22,13 +22,9 @@ public class ExportViewController {
     @FXML
     private void initialize() {
         exportController = AppContext.get().exportController();
-        try {
-            criteriaCombo.getItems().setAll(exportController.openExportOptions());
-            if (!criteriaCombo.getItems().isEmpty()) {
-                criteriaCombo.getSelectionModel().selectFirst();
-            }
-        } catch (UnsupportedOperationException e) {
-            // Placeholder fallback
+        criteriaCombo.getItems().setAll(exportController.openExportOptions());   // SSD openExportOptions()
+        if (!criteriaCombo.getItems().isEmpty()) {
+            criteriaCombo.getSelectionModel().selectFirst();
         }
     }
 
@@ -40,23 +36,31 @@ public class ExportViewController {
             AlertHelper.warn("Export", "Please select export criteria first.");
             return;
         }
-
         try {
-            exportController.requestExport(criteria);
-
-            FileChooser chooser = new FileChooser();
-            chooser.setTitle("Save Exported Leads");
-            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files (*.csv)", "*.csv"));
-            chooser.setInitialFileName("leads_export.csv");
-            File destination = chooser.showSaveDialog(SceneManager.primaryStage());
-            if (destination != null) {
-                int exportedRows = exportController.chooseDestination(destination.getAbsolutePath());
-                AlertHelper.info("Export Complete", exportedRows + " leads successfully exported to " + destination.getName());
-            }
-        } catch (UnsupportedOperationException e) {
-            AlertHelper.info("Export Data (UC12)", "Export engine is under active development by Sufiyan.");
+            exportController.requestExport(criteria);                  // UC12 extension: empty -> warning, no file
         } catch (BlmsException e) {
-            AlertHelper.error(e);
+            AlertHelper.warn("Export", e.getMessage());
+            return;
+        }
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Save Exported Leads");
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files (*.csv)", "*.csv"));
+        chooser.setInitialFileName("leads_export.csv");
+        while (true) {
+            File destination = chooser.showSaveDialog(SceneManager.primaryStage());
+            if (destination == null) {
+                return;
+            }
+            try {
+                int exportedRows = exportController.chooseDestination(destination.getAbsolutePath());
+                AlertHelper.info("Export Complete", exportedRows + " leads exported to " + destination.getName());
+                return;
+            } catch (BlmsException e) {                               // UC12 extension: write denied
+                AlertHelper.warn("Export", e.getMessage());
+                if (destination.getParentFile() != null && destination.getParentFile().isDirectory()) {
+                    chooser.setInitialDirectory(destination.getParentFile());
+                }
+            }
         }
     }
 }

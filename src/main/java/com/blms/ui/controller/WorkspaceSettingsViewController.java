@@ -38,8 +38,8 @@ public class WorkspaceSettingsViewController {
                 smtpPortField.setText(form.smtpPort() > 0 ? String.valueOf(form.smtpPort()) : "");
                 smtpUsernameField.setText(form.smtpUsername());
             }
-        } catch (UnsupportedOperationException e) {
-            // Placeholder: Backend UC02 openWorkspaceSettings is not implemented yet
+        } catch (BlmsException e) {
+            AlertHelper.error(e);
         }
     }
 
@@ -69,9 +69,8 @@ public class WorkspaceSettingsViewController {
         SmtpCredentials smtp = new SmtpCredentials(host, port, user, password);
         try {
             workspaceController.saveWorkspace(company, industry, services, smtp);
-            AlertHelper.info("Workspace Settings", "Workspace configured successfully.");
-        } catch (UnsupportedOperationException e) {
-            AlertHelper.info("Workspace Settings (UC02)", "Workspace settings persistence is under active development by Sufiyan.");
+            smtpPasswordField.clear();
+            AlertHelper.info("Workspace Settings", "Workspace Configured Successfully");   // D3 UC02 step 5
         } catch (ValidationException e) {
             highlightErrors();
             AlertHelper.error(e);
@@ -85,6 +84,9 @@ public class WorkspaceSettingsViewController {
         targetIndustryField.getStyleClass().remove("field-error");
         servicesArea.getStyleClass().remove("field-error");
         smtpPortField.getStyleClass().remove("field-error");
+        smtpHostField.getStyleClass().remove("field-error");
+        smtpUsernameField.getStyleClass().remove("field-error");
+        smtpPasswordField.getStyleClass().remove("field-error");
     }
 
     private void highlightErrors() {
@@ -96,6 +98,12 @@ public class WorkspaceSettingsViewController {
         }
         if (servicesArea.getText() == null || servicesArea.getText().isBlank()) {
             servicesArea.getStyleClass().add("field-error");
+        }
+        for (javafx.scene.control.TextInputControl f : new javafx.scene.control.TextInputControl[] {
+                smtpHostField, smtpPortField, smtpUsernameField, smtpPasswordField}) {
+            if (f.getText() == null || f.getText().isBlank()) {
+                f.getStyleClass().add("field-error");
+            }
         }
     }
 }

@@ -1,20 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- OWNER: Ismail. fx:id / onAction names must match the view controller exactly. -->
+<!-- OWNER: Ismail (completed by Sufiyan, CONFLICTS.md S-006). fx:id / onAction names must match the view controller exactly. -->
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.blms.ui.controller.LeadDetailViewController" spacing="12">
-    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.blms.ui.controller.LeadDetailViewController" spacing="14">
+    <padding><Insets top="20" right="24" bottom="20" left="24"/></padding>
+
     <HBox spacing="12" alignment="CENTER_LEFT">
+        <Button text="&#8592; Leads" onAction="#onBack"/>
         <Label fx:id="companyLabel" styleClass="title"/>
-        <ComboBox fx:id="statusCombo" onAction="#onStatusChanged"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="Pipeline stage:" styleClass="hint"/>
+        <ComboBox fx:id="statusCombo" onAction="#onStatusChanged" prefWidth="160"/>
     </HBox>
-    <Label text="Interaction timeline"/>
-    <ListView fx:id="timelineList" VBox.vgrow="ALWAYS"/>
-    <Button text="Add Note" onAction="#onAddNote"/>
-    <TextArea fx:id="noteArea" promptText="Summary of the call / meeting" prefRowCount="3" wrapText="true"/>
-    <Button fx:id="submitNoteButton" text="Submit" onAction="#onSubmitNote" styleClass="primary"/>
-    <Label text="Email drafts (UC10)"/>
-    <ListView fx:id="draftsList" prefHeight="120"/>
-    <Button text="Review Draft" onAction="#onOpenDraft"/>
+    <Label fx:id="contactLabel" styleClass="subtitle"/>
+    <Label fx:id="statusInfoLabel" styleClass="hint"/>
+
+    <HBox spacing="16" VBox.vgrow="ALWAYS">
+        <VBox styleClass="card" spacing="10" HBox.hgrow="ALWAYS" prefWidth="520">
+            <Label text="Interaction timeline (UC07)" styleClass="section-header"/>
+            <ListView fx:id="timelineList" VBox.vgrow="ALWAYS"/>
+            <Button text="Add Note" onAction="#onAddNote"/>
+            <TextArea fx:id="noteArea" promptText="Summary of the call / meeting" prefRowCount="3" wrapText="true"/>
+            <HBox alignment="CENTER_RIGHT">
+                <Button fx:id="submitNoteButton" text="Submit" onAction="#onSubmitNote" styleClass="primary-button"/>
+            </HBox>
+        </VBox>
+        <VBox styleClass="card" spacing="10" HBox.hgrow="ALWAYS" prefWidth="460">
+            <Label text="Email drafts and send attempts (UC10, UC11)" styleClass="section-header"/>
+            <ListView fx:id="draftsList" VBox.vgrow="ALWAYS"/>
+            <HBox alignment="CENTER_RIGHT">
+                <Button fx:id="reviewDraftButton" text="Review Draft..." onAction="#onOpenDraft" styleClass="primary-button"/>
+            </HBox>
+        </VBox>
+    </HBox>
 </VBox>

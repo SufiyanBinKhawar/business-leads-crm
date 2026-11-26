@@ -71,6 +71,11 @@ public class LeadFormViewController {
         formSubtitleLabel.setText("Enter prospect company and primary contact details (UC03)");
         archivedBox.setVisible(false);
         archivedBox.setManaged(false);
+        // D5 saveLead(companyName, contactName, email, jobRole): industry and phone are edited later (UC06)
+        industryBox.setVisible(false);
+        industryBox.setManaged(false);
+        phoneBox.setVisible(false);
+        phoneBox.setManaged(false);
 
         try {
             LeadForm blankForm = leadController.requestNewLeadForm();
@@ -104,8 +109,6 @@ public class LeadFormViewController {
             if (lead != null) {
                 populateFields(lead);
             }
-        } catch (UnsupportedOperationException e) {
-            errorLabel.setText("Backend edit query pending: " + e.getMessage());
         } catch (BlmsException e) {
             errorLabel.setText(e.getMessage());
         }
@@ -232,13 +235,10 @@ public class LeadFormViewController {
                 String msg = error instanceof DuplicateLeadException ? error.getMessage() : error.getCause().getMessage();
                 emailField.getStyleClass().add("field-error");
                 errorLabel.setText(msg);
-                AlertHelper.warn("Duplicate Lead", msg + "\n\nUnder D3/D5 rules, duplicate leads matching an existing domain are not allowed.");
+                offerExistingProfile(msg, email);        // D3 UC03: "offers a link to go to the existing profile"
             } else if (error instanceof ValidationException || (error != null && error.getCause() instanceof ValidationException)) {
                 String msg = error instanceof ValidationException ? error.getMessage() : error.getCause().getMessage();
                 errorLabel.setText(msg);
-            } else if (error instanceof UnsupportedOperationException || (error != null && error.getCause() instanceof UnsupportedOperationException)) {
-                String msg = error instanceof UnsupportedOperationException ? error.getMessage() : error.getCause().getMessage();
-                errorLabel.setText("Blocked on Sufiyan's Task S-2: " + msg);
             } else if (error instanceof BlmsException) {
                 errorLabel.setText(error.getMessage());
             } else {
@@ -268,6 +268,28 @@ public class LeadFormViewController {
         Stage stage = (Stage) cancelButton.getScene().getWindow();
         if (stage != null) {
             stage.close();
+        }
+    }
+
+    /** UC03 duplicate extension: find the lead with the same email domain (SSD filterLeads) and open its profile. */
+    private void offerExistingProfile(String message, String email) {
+        if (!AlertHelper.confirm("Duplicate Lead", message + "\n\nOpen the existing lead's profile?")) {
+            return;
+        }
+        String domain = email.substring(email.indexOf('@') + 1).toLowerCase();
+        try {
+            java.util.List<Lead> matches = leadController.filterLeads(
+                    new com.blms.dto.LeadFilter(null, null, "@" + domain, true));
+            if (matches.isEmpty()) {
+                AlertHelper.warn("Duplicate Lead", "The existing lead could not be found.");
+                return;
+            }
+            closeDialog();
+            LeadDetailViewController detail = com.blms.ui.navigation.SceneManager.showInShell(
+                    com.blms.ui.navigation.View.LEAD_DETAIL);
+            detail.setLead(matches.get(0).getLeadId());
+        } catch (BlmsException e) {
+            AlertHelper.error(e);
         }
     }
 }

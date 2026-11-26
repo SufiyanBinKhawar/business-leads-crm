@@ -10,6 +10,8 @@ import com.blms.dto.LeadFilter;
 import com.blms.ui.navigation.SceneManager;
 import com.blms.ui.navigation.View;
 import com.blms.ui.util.AlertHelper;
+import com.blms.ui.util.FxAsync;
+import com.blms.exception.BlmsException;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -231,6 +233,7 @@ public class LeadsViewController {
             }
         };
 
+        loadingIndicator.visibleProperty().unbind();
         loadingIndicator.visibleProperty().bind(service.runningProperty());
         applyFilterButton.disableProperty().bind(service.runningProperty());
 
@@ -298,25 +301,76 @@ public class LeadsViewController {
         }
     }
 
-    /** UC09 placeholder for I-9. */
+    /** UC09 SSD generateDrafts(qualifiedLeadIds) -> jobId; result via FxAsync + getLastResultCount (G1). */
     @FXML
     private void onGenerateDrafts() {
-        List<Lead> selected = leadsTable.getSelectionModel().getSelectedItems();
-        if (selected.isEmpty()) {
-            AlertHelper.warn("Generate Drafts", "Please select at least one lead.");
+        List<Long> ids = selectedIds();
+        if (ids.isEmpty()) {
+            AlertHelper.warn("Generate Drafts", "Please select at least one qualified lead.");
             return;
         }
-        AlertHelper.info("Generate Drafts (UC09)", "Draft generation will be fully wired in Task I-9. Selected leads: " + selected.size());
+        try {
+            Long jobId = outreachController.generateDrafts(ids);
+            loadingIndicator.visibleProperty().unbind();
+            generateDraftsButton.setText("Generating...");
+            loadingIndicator.setVisible(true);
+            FxAsync.onComplete(jobId, () -> {
+                resetBatchUi();
+                int ok = outreachController.getLastResultCount();
+                int failed = outreachController.getLastFailureCount();
+                AlertHelper.info("Drafts ready for review",
+                        ok + " draft(s) generated." + (failed == 0 ? "" : "\n" + failed
+                                + " lead(s) skipped (LLM failure or not in QUALIFIED stage).")
+                                + "\n\nOpen a lead to review its draft (UC10).");
+            }, error -> {
+                resetBatchUi();
+                AlertHelper.error(error);
+            });
+        } catch (BlmsException e) {
+            AlertHelper.error(e);
+        }
     }
 
-    /** UC11 placeholder for I-9. */
+    /** UC11 SSD sendApprovedEmails(leadIds) -> jobId; result via FxAsync + getLastResultCount (G1). */
     @FXML
     private void onSendEmails() {
-        List<Lead> selected = leadsTable.getSelectionModel().getSelectedItems();
-        if (selected.isEmpty()) {
-            AlertHelper.warn("Send Emails", "Please select at least one lead.");
+        List<Long> ids = selectedIds();
+        if (ids.isEmpty()) {
+            AlertHelper.warn("Send Emails", "Please select at least one lead with an approved draft.");
             return;
         }
-        AlertHelper.info("Send Emails (UC11)", "Automated outreach dispatch will be fully wired in Task I-9. Selected leads: " + selected.size());
+        if (!AlertHelper.confirm("Send Emails", "Send the approved draft of " + ids.size() + " selected lead(s)?")) {
+            return;
+        }
+        try {
+            Long jobId = outreachController.sendApprovedEmails(ids);
+            loadingIndicator.visibleProperty().unbind();
+            sendEmailsButton.setText("Sending...");
+            loadingIndicator.setVisible(true);
+            FxAsync.onComplete(jobId, () -> {
+                resetBatchUi();
+                int sent = outreachController.getLastResultCount();
+                int failed = outreachController.getLastFailureCount();
+                AlertHelper.info("Dispatch completed", sent + " email(s) sent - those leads are now CONTACTED."
+                        + (failed == 0 ? "" : "\n" + failed + " failed (invalid recipient) - see the lead's profile."));
+                onApplyFilter();
+            }, error -> {
+                resetBatchUi();
+                AlertHelper.error(error);
+                onApplyFilter();
+            });
+        } catch (BlmsException e) {
+            AlertHelper.error(e);
+        }
+    }
+
+    private List<Long> selectedIds() {
+        return leadsTable.getSelectionModel().getSelectedItems().stream().map(Lead::getLeadId).toList();
+    }
+
+    private void resetBatchUi() {
+        generateDraftsButton.setText("Generate Drafts");
+        sendEmailsButton.setText("Send Emails");
+        loadingIndicator.setVisible(false);
     }
 }
