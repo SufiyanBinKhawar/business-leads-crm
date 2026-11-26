@@ -1,22 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- OWNER: Ismail. fx:id / onAction names must match the view controller exactly. -->
+<!-- OWNER: Ismail. fx:id / onAction names must match MainShellViewController exactly. -->
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.blms.ui.controller.MainShellViewController"
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.blms.ui.controller.MainShellViewController"
             prefWidth="1100" prefHeight="700">
     <left>
-        <VBox styleClass="sidebar" spacing="8">
-            <padding><Insets top="16" right="12" bottom="16" left="12"/></padding>
+        <VBox styleClass="sidebar" spacing="6">
+            <padding><Insets top="20" right="14" bottom="20" left="14"/></padding>
+            <Label text="Business Leads CRM" styleClass="sidebar-brand"/>
             <Label fx:id="userLabel" styleClass="sidebar-user"/>
-            <Button text="Dashboard" onAction="#onDashboard" maxWidth="Infinity"/>
-            <Button text="Leads" onAction="#onLeads" maxWidth="Infinity"/>
-            <Button fx:id="workspaceSettingsButton" text="Workspace Settings" onAction="#onWorkspaceSettings" maxWidth="Infinity"/>
+            <Separator styleClass="sidebar-divider"/>
+            <Button text="Dashboard" onAction="#onDashboard" styleClass="nav-button" maxWidth="Infinity"/>
+            <Button text="Leads" onAction="#onLeads" styleClass="nav-button" maxWidth="Infinity"/>
+            <Button text="Import CSV" onAction="#onImportCsv" styleClass="nav-button" maxWidth="Infinity"/>
+            <Button text="Export" onAction="#onExport" styleClass="nav-button" maxWidth="Infinity"/>
+            <Button fx:id="workspaceSettingsButton" text="Workspace Settings" onAction="#onWorkspaceSettings" styleClass="nav-button" maxWidth="Infinity"/>
             <Region VBox.vgrow="ALWAYS"/>
-            <Button text="Logout" onAction="#onLogout" maxWidth="Infinity"/>
+            <Separator styleClass="sidebar-divider"/>
+            <Button text="Logout" onAction="#onLogout" styleClass="nav-button, logout-button" maxWidth="Infinity"/>
         </VBox>
     </left>
     <center>
-        <StackPane fx:id="contentArea"/>
+        <StackPane fx:id="contentArea" styleClass="content-area"/>
     </center>
 </BorderPane>
