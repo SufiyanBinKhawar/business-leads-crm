@@ -1,5 +1,7 @@
 package com.blms.domain;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
 /** D5 Figure 1 IdealCustomerProfile - composed by Workspace (defines ICP, +icp 0..1). */
@@ -25,8 +27,9 @@ public class IdealCustomerProfile {
 
     /** SD05 steps 11-12: the ICP builds its own search query (Information Expert). */
     public String toSearchQuery() {
-        // TODO(Sufiyan, UC05): build the provider query string, e.g. "industry=<targetIndustry>&keywords=<criteria>"
-        throw new UnsupportedOperationException("TODO UC05 IdealCustomerProfile.toSearchQuery");
+        String keywords = criteria == null ? "" : criteria.replaceFirst("^services=", "");
+        return "industry=" + URLEncoder.encode(targetIndustry == null ? "" : targetIndustry, StandardCharsets.UTF_8)
+                + "&keywords=" + URLEncoder.encode(keywords, StandardCharsets.UTF_8);
     }
 
     public Long getIcpId() { return icpId; }
