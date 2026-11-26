@@ -115,6 +115,8 @@ public class Lead {
     /** Used by LeadRepository when loading. */
     public void addLoadedContact(Contact contact) { contacts.add(contact); }
     public void addLoadedInteraction(InteractionLog log) { history.add(log); }
+    /** Used by LeadRepository when loading a stored draft (CONFLICTS.md S-004, load helper like gap G8). */
+    public void addLoadedDraft(EmailDraft draft) { drafts.add(draft); }
 
     public Long getLeadId() { return leadId; }
     public void setLeadId(Long leadId) { this.leadId = leadId; }

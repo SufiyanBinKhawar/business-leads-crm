@@ -1,8 +1,11 @@
 package com.blms.persistence;
 
 import com.blms.domain.Contact;
+import com.blms.domain.DraftStatus;
+import com.blms.domain.EmailDraft;
 import com.blms.domain.InteractionLog;
 import com.blms.domain.Lead;
+import com.blms.domain.OutreachDispatch;
 import com.blms.domain.PipelineStatus;
 import com.blms.domain.UserAccount;
 import com.blms.domain.UserRole;
@@ -187,8 +190,9 @@ public class LeadRepository extends JdbcRepository<Lead> {
     }
 
     /**
-     * SD06 steps 7-8: the lead with its creator, contacts and interaction history (newest first, each with its
-     * author). Returns null when no row exists.
+     * SD06 steps 7-8: the lead with its creator, contacts, interaction history (newest first, each with its
+     * author) and its email drafts (newest first, each with its +recipient and send attempts - UC10 entry point,
+     * gap G14 failed attempts; CONFLICTS.md S-004). Returns null when no row exists.
      */
     @Override
     public Lead findById(Long id) {
@@ -219,11 +223,59 @@ public class LeadRepository extends JdbcRepository<Lead> {
                     }
                 }
             }
+            loadDrafts(lead);
             return lead;
         });
     }
 
     // ------------------------------------------------------------------ private helpers
+
+    /** +drafts of one lead with their +recipient (one of the lead's contacts) and +attempts. */
+    private void loadDrafts(Lead lead) throws SQLException {
+        Map<Long, Contact> contactsById = new LinkedHashMap<>();
+        for (Contact c : lead.getContacts()) {
+            contactsById.put(c.getContactId(), c);
+        }
+        Map<Long, EmailDraft> draftsById = new LinkedHashMap<>();
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT draft_id, recipient_contact_id, subject, body, status, created_at, approved_at "
+                        + "FROM email_drafts WHERE lead_id = ? ORDER BY created_at DESC, draft_id DESC")) {
+            ps.setLong(1, lead.getLeadId());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Contact recipient = contactsById.get(rs.getLong("recipient_contact_id"));
+                    if (recipient == null) {
+                        continue;                       // cannot happen: the FK points at one of the lead's contacts
+                    }
+                    EmailDraft d = new EmailDraft(rs.getLong("draft_id"), rs.getString("subject"),
+                            rs.getString("body"), DraftStatus.valueOf(rs.getString("status")),
+                            ldt(rs.getTimestamp("created_at")), ldt(rs.getTimestamp("approved_at")), recipient);
+                    d.setLeadId(lead.getLeadId());
+                    lead.addLoadedDraft(d);
+                    draftsById.put(d.getDraftId(), d);
+                }
+            }
+        }
+        if (draftsById.isEmpty()) {
+            return;
+        }
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT o.dispatch_id, o.draft_id, o.sent_at, o.delivery_status, o.error_message "
+                        + "FROM outreach_dispatches o JOIN email_drafts d ON d.draft_id = o.draft_id "
+                        + "WHERE d.lead_id = ? ORDER BY o.sent_at, o.dispatch_id")) {
+            ps.setLong(1, lead.getLeadId());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    EmailDraft d = draftsById.get(rs.getLong("draft_id"));
+                    if (d != null) {
+                        d.addLoadedAttempt(new OutreachDispatch(rs.getLong("dispatch_id"),
+                                ldt(rs.getTimestamp("sent_at")), rs.getString("delivery_status"),
+                                rs.getString("error_message"), d.getRecipient()));
+                    }
+                }
+            }
+        }
+    }
 
     /** Writes one lead and its parts inside the caller's transaction. */
     private Lead write(Lead lead, List<Runnable> undo) throws SQLException {
