@@ -1,5 +1,6 @@
 package com.blms.domain;
 
+import com.blms.exception.ValidationException;
 import com.blms.util.Validator;
 
 import java.time.LocalDateTime;
@@ -42,6 +43,9 @@ public class EmailDraft {
 
     /** SD10 step 8. UC10 extension: an empty draft is rejected. */
     public void revise(String subject, String body) {
+        if (status == DraftStatus.SENT) {
+            throw new ValidationException("This email has already been sent and can no longer be edited");
+        }
         this.subject = Validator.requireText(subject, "Subject");
         this.body = Validator.requireText(body, "Email body");
     }
