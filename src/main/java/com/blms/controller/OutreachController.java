@@ -18,6 +18,7 @@ import com.blms.service.OutreachDispatcher;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * D5 Figure 3 «Controller» OutreachController - UC09 Generate Emails via LLM (SD09), UC10 Review and Revise Drafts
@@ -181,7 +182,7 @@ public class OutreachController {
     }
 
     private static void requireSelection(List<Long> ids, String message) {
-        if (ids == null || ids.isEmpty() || ids.contains(null)) {
+        if (ids == null || ids.isEmpty() || ids.stream().anyMatch(Objects::isNull)) {
             throw new ValidationException(message);
         }
     }
