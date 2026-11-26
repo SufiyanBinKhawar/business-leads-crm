@@ -120,3 +120,14 @@ Other fixed decisions (from the deliverables, not gaps):
 - **Diagram impact:** D5 Fig. 1 - add the two operations to Lead and EmailDraft (or list them under gap G8).
 - **Agreed by:** Sufiyan (2026-11-25), Ismail ( )
 - **Resolution:** until both sign, `findById` loads creator, contacts and history only; the drafts list stays empty.
+
+### S-005 · OWNERSHIP-EXCEPTION · Status: OPEN
+- **Date:** 2026-11-26
+- **Raised by:** Sufiyan
+- **Files:** docs/DEMO_NOTES_SUFIYAN.md (new file)
+- **Problem:** `docs/**` is shared (WORK_DIVISION.md §2). I need a personal demo script for my use cases
+  (UC04, UC05, UC08, UC09, UC10, UC11).
+- **Proposal:** add the new file only; no existing doc is changed. Ismail may add `docs/DEMO_NOTES_ISMAIL.md` the same way.
+- **Diagram impact:** none.
+- **Agreed by:** Sufiyan (2026-11-26), Ismail ( )
+- **Resolution:** PR from `bl/demo-notes`, merged after Ismail signs.
