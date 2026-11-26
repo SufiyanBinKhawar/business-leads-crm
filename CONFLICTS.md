@@ -120,12 +120,23 @@ Other fixed decisions (from the deliverables, not gaps):
 - **Diagram impact:** D5 Fig. 1 - add the two operations to Lead and EmailDraft (or list them under gap G8).
 - **Agreed by:** Sufiyan (2026-11-25), Ismail (2026-11-26 - verbal approval given in person, recorded by Sufiyan; GitHub confirmation to follow)
 - **Resolution:** until both sign, `findById` loads creator, contacts and history only; the drafts list stays empty.
+
+### S-005 · OWNERSHIP-EXCEPTION · Status: DONE
+- **Date:** 2026-11-26
+- **Raised by:** Sufiyan
+- **Files:** docs/DEMO_NOTES_SUFIYAN.md (new file)
+- **Problem:** `docs/**` is shared (WORK_DIVISION.md §2). I need a personal demo script for my use cases
+  (UC04, UC05, UC08, UC09, UC10, UC11).
+- **Proposal:** add the new file only; no existing doc is changed. Ismail may add `docs/DEMO_NOTES_ISMAIL.md` the same way.
+- **Diagram impact:** none.
+- **Agreed by:** Sufiyan (2026-11-26), Ismail (2026-11-26 - verbal approval given in person, recorded by Sufiyan; GitHub confirmation to follow)
+- **Resolution:** PR from `bl/demo-notes`, merged in PR #7.
 - **Follow-up (2026-11-26, Sufiyan):** implemented on `bl/s004-draft-loading`: `Lead.addLoadedDraft`,
   `EmailDraft.addLoadedAttempt`, contract lines `!load addLoadedDraft` / `!load addLoadedAttempt`, and
   `LeadRepository.findById` now loads drafts (with `+recipient`) and their attempts. **Redraw D5 Fig. 1** (or list both
   under G8). Merged in PR #8.
 
-### S-006 · OWNERSHIP-EXCEPTION · Status: AGREED
+### S-006 · OWNERSHIP-EXCEPTION · Status: DONE
 - **Date:** 2026-11-26
 - **Raised by:** Sufiyan (at Ismail's request)
 - **Files:** src/main/java/com/blms/ui/**, src/main/resources/com/blms/ui/** (Ismail's files)
@@ -135,4 +146,4 @@ Other fixed decisions (from the deliverables, not gaps):
   existing D5 controller methods are called; no contract change. Ismail reviews the PR.
 - **Diagram impact:** none.
 - **Agreed by:** Sufiyan (2026-11-26), Ismail (2026-11-26 - verbal approval given in person, recorded by Sufiyan; GitHub confirmation to follow)
-- **Resolution:** PR from `bl/ui-completion`, merged only after Ismail's approval.
+- **Resolution:** merged in PR #9 (Ismail approved in person).
