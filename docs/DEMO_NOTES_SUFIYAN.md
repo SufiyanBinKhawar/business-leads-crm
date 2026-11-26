@@ -21,8 +21,8 @@ Code paths are `package.Class.method`. Open the class in IntelliJ and press Ctrl
    - Show **UC11 before UC02** (the seed workspace has no host), or
    - Save real credentials in UC02, for example `smtp.gmail.com`, port `587`, your Gmail address and an
      **app password**, and send to your own second address.
-5. **Known limit: draft list (CONFLICTS.md S-004).** Until Ismail signs S-004, `lead.getDrafts()` is empty after a reload,
-   so the UI cannot list a lead's drafts. Show UC10 right after UC09, or open a draft by id.
+5. **Drafts on the lead profile.** Since S-004 (PR #8), a reloaded lead carries its drafts and send attempts, so UC10
+   starts from the lead profile: double-click a lead, select the draft, then click Review Draft.
 6. Demo order that tells one story: UC01 → UC04 (import sample CSV) → UC08 (qualify two leads) → UC05 (discovery)
    → UC09 → UC10 → UC11 → UC12.
 
@@ -214,9 +214,10 @@ any open state → CLOSED_LOST. The two closed states are terminal.
 - **Why does the draft approve itself instead of the controller setting the status?** Information Expert plus encapsulation.
   There is no `setStatus`. Status changes only through `approve()` and `recordDispatch()`.
 - **Do newlines survive?** Yes. The body is a CLOB and Jakarta Mail sends it as UTF-8 plain text (D3 special requirement).
-- **How does the user find the draft?** The lead profile lists `lead.getDrafts()`. *Known limit:* loading drafts of an existing
-  lead needs `Lead.addLoadedDraft` (CONFLICTS S-004, waiting for Ismail's signature). Be ready to say: "D5 has no
-  operation to attach a stored draft to a Lead. We logged it as S-004 instead of working around the frozen design."
+- **How does the user find the draft?** Leads screen → double-click the lead → "Email drafts and send attempts" list
+  (`lead.getDrafts()`, loaded by `LeadRepository.findById`). D5 had no operation to attach a *stored* draft to a Lead.
+  We logged that as CONFLICTS S-004 and both signed it before adding `Lead.addLoadedDraft` / `EmailDraft.addLoadedAttempt`
+  (redraw D5 Fig. 1). This shows we changed the frozen design only through the agreed process.
 
 ---
 
@@ -271,5 +272,5 @@ any open state → CLOSED_LOST. The two closed states are terminal.
 | What happens on a DB error mid-save? | `JdbcRepository.inTransaction` rolls back, restores auto-commit and throws `DataAccessException`. Ids given out in the failed transaction are cleared |
 | Why no DELETE? | UC06: leads are archived (`is_archived = 1`). R7 forbids `DELETE FROM` |
 | How do you prove code = design? | `scripts/check-d5-conformance.py` compares every class, public method and field with `scripts/d5-contract.txt` (D5) in CI. Every additional public method is an approved gap (CONFLICTS §2) |
-| How was it tested? | 71 JUnit tests with fake repositories (no DB/network), at least one per D3 extension. JDBC failures use a proxy `Connection`, HTTP uses a local `HttpServer`. Plus a full UC01-UC12 run against Oracle 26ai Free |
+| How was it tested? | 72 JUnit tests with fake repositories (no DB/network), at least one per D3 extension. JDBC failures use a proxy `Connection`, HTTP uses a local `HttpServer`. Plus a full UC01-UC12 run against Oracle 26ai Free |
 | Exception design? | `BlmsException` and 6 subclasses. The message is always the D3 wording, so the UI just shows `getMessage()` |

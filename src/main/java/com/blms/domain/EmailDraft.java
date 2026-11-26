@@ -73,6 +73,12 @@ public class EmailDraft {
         return dispatch;
     }
 
+    /** Used by LeadRepository when loading a stored send attempt (CONFLICTS.md S-004, load helper like gap G8). */
+    public void addLoadedAttempt(OutreachDispatch attempt) {
+        attempts.add(attempt);
+        recipient.addDispatch(attempt);
+    }
+
     public Long getDraftId() { return draftId; }
     public void setDraftId(Long draftId) { this.draftId = draftId; }
     public String getSubject() { return subject; }

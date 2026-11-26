@@ -31,6 +31,8 @@ public class MainShellViewController {
 
     @FXML private void onDashboard() { SceneManager.showInShell(View.DASHBOARD); }
     @FXML private void onLeads() { SceneManager.showInShell(View.LEADS); }
+    @FXML private void onImportCsv() { SceneManager.showInShell(View.CSV_IMPORT); }
+    @FXML private void onExport() { SceneManager.showInShell(View.EXPORT); }
     @FXML private void onWorkspaceSettings() { SceneManager.showInShell(View.WORKSPACE_SETTINGS); }
 
     @FXML

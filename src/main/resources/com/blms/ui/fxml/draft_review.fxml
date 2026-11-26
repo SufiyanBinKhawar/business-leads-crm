@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- OWNER: Ismail. fx:id / onAction names must match the view controller exactly. -->
+<!-- OWNER: Ismail (completed by Sufiyan, CONFLICTS.md S-006). fx:id / onAction names must match the view controller exactly. -->
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.blms.ui.controller.DraftReviewViewController"
-      spacing="8" prefWidth="620" prefHeight="480">
-    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
-    <Label fx:id="recipientLabel"/>
+      spacing="10" prefWidth="640" prefHeight="500">
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+    <Label text="Review and revise draft (UC10)" styleClass="title"/>
+    <Label fx:id="recipientLabel" styleClass="subtitle"/>
+    <Label fx:id="statusLabel" styleClass="hint"/>
+    <Label text="Subject" styleClass="section-header"/>
     <TextField fx:id="subjectField" promptText="Subject"/>
+    <Label text="Email body" styleClass="section-header"/>
     <TextArea fx:id="bodyArea" wrapText="true" VBox.vgrow="ALWAYS"/>
-    <Button fx:id="approveButton" text="Approve" onAction="#onApprove" styleClass="primary"/>
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Cancel" onAction="#onCancel"/>
+        <Button fx:id="approveButton" text="Approve" onAction="#onApprove" styleClass="primary-button"/>
+    </HBox>
 </VBox>

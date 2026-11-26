@@ -103,7 +103,7 @@ Other fixed decisions (from the deliverables, not gaps):
   gives "Incorrect username or password"; `mvn javafx:run` starts the UI.
   Note for setup: run 01 connected to the PDB (`//localhost:1521/FREEPDB1`), not the CDB root (ORA-65096).
 
-### S-004 · CONTRACT-CHANGE · Status: OPEN
+### S-004 · CONTRACT-CHANGE · Status: DONE
 - **Date:** 2026-11-25
 - **Raised by:** Sufiyan
 - **Files:** src/main/java/com/blms/domain/Lead.java, src/main/java/com/blms/domain/EmailDraft.java,
@@ -118,10 +118,10 @@ Other fixed decisions (from the deliverables, not gaps):
   `public void EmailDraft.addLoadedAttempt(OutreachDispatch a)`; contract lines `!load addLoadedDraft` /
   `!load addLoadedAttempt`; `LeadRepository.findById` then loads drafts (with `+recipient`) and their attempts.
 - **Diagram impact:** D5 Fig. 1 - add the two operations to Lead and EmailDraft (or list them under gap G8).
-- **Agreed by:** Sufiyan (2026-11-25), Ismail ( )
+- **Agreed by:** Sufiyan (2026-11-25), Ismail (2026-11-26 - verbal approval given in person, recorded by Sufiyan; GitHub confirmation to follow)
 - **Resolution:** until both sign, `findById` loads creator, contacts and history only; the drafts list stays empty.
 
-### S-005 · OWNERSHIP-EXCEPTION · Status: OPEN
+### S-005 · OWNERSHIP-EXCEPTION · Status: DONE
 - **Date:** 2026-11-26
 - **Raised by:** Sufiyan
 - **Files:** docs/DEMO_NOTES_SUFIYAN.md (new file)
@@ -129,5 +129,21 @@ Other fixed decisions (from the deliverables, not gaps):
   (UC04, UC05, UC08, UC09, UC10, UC11).
 - **Proposal:** add the new file only; no existing doc is changed. Ismail may add `docs/DEMO_NOTES_ISMAIL.md` the same way.
 - **Diagram impact:** none.
-- **Agreed by:** Sufiyan (2026-11-26), Ismail ( )
-- **Resolution:** PR from `bl/demo-notes`, merged after Ismail signs.
+- **Agreed by:** Sufiyan (2026-11-26), Ismail (2026-11-26 - verbal approval given in person, recorded by Sufiyan; GitHub confirmation to follow)
+- **Resolution:** PR from `bl/demo-notes`, merged in PR #7.
+- **Follow-up (2026-11-26, Sufiyan):** implemented on `bl/s004-draft-loading`: `Lead.addLoadedDraft`,
+  `EmailDraft.addLoadedAttempt`, contract lines `!load addLoadedDraft` / `!load addLoadedAttempt`, and
+  `LeadRepository.findById` now loads drafts (with `+recipient`) and their attempts. **Redraw D5 Fig. 1** (or list both
+  under G8). Merged in PR #8.
+
+### S-006 · OWNERSHIP-EXCEPTION · Status: DONE
+- **Date:** 2026-11-26
+- **Raised by:** Sufiyan (at Ismail's request)
+- **Files:** src/main/java/com/blms/ui/**, src/main/resources/com/blms/ui/** (Ismail's files)
+- **Problem:** Ismail asked Sufiyan to finish the remaining UI tasks (I-4 lead profile, I-6 CSV mapping grid, I-8 draft
+  review, I-9 Generate/Send buttons, placeholder clean-up) so the whole UC01-UC12 flow works for the demo.
+- **Proposal:** Sufiyan edits those UI files on `bl/ui-completion`, building on Ismail's `ui/phase1-leads` commit. Only
+  existing D5 controller methods are called; no contract change. Ismail reviews the PR.
+- **Diagram impact:** none.
+- **Agreed by:** Sufiyan (2026-11-26), Ismail (2026-11-26 - verbal approval given in person, recorded by Sufiyan; GitHub confirmation to follow)
+- **Resolution:** merged in PR #9 (Ismail approved in person).

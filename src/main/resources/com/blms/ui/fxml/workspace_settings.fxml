@@ -1,18 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- OWNER: Ismail. fx:id / onAction names must match the view controller exactly. -->
+<!-- OWNER: Ismail. fx:id / onAction names must match WorkspaceSettingsViewController exactly. -->
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.blms.ui.controller.WorkspaceSettingsViewController" spacing="8" maxWidth="520">
-    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
-    <Label text="Workspace Settings" styleClass="title"/>
-    <TextField fx:id="companyNameField" promptText="Company name"/>
-    <TextField fx:id="targetIndustryField" promptText="Target industry"/>
-    <TextArea fx:id="servicesArea" promptText="Services offered" prefRowCount="3" wrapText="true"/>
-    <Label text="SMTP (Jakarta Mail)"/>
-    <TextField fx:id="smtpHostField" promptText="SMTP host"/>
-    <TextField fx:id="smtpPortField" promptText="Port (465 or 587)"/>
-    <TextField fx:id="smtpUsernameField" promptText="SMTP username"/>
-    <PasswordField fx:id="smtpPasswordField" promptText="SMTP password"/>
-    <Button text="Save" onAction="#onSave" styleClass="primary"/>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.blms.ui.controller.WorkspaceSettingsViewController" spacing="16">
+    <padding><Insets top="20" right="24" bottom="20" left="24"/></padding>
+
+    <VBox spacing="4">
+        <Label text="Workspace Settings" styleClass="title"/>
+        <Label text="Configure company profile, target industry and email dispatch settings (UC02)" styleClass="subtitle"/>
+    </VBox>
+
+    <VBox styleClass="card" spacing="14" maxWidth="600">
+        <Label text="Company Profile &amp; ICP Definition" styleClass="section-header"/>
+        <VBox spacing="6">
+            <Label text="Company Name" styleClass="hint"/>
+            <TextField fx:id="companyNameField" promptText="Enter registered business name"/>
+        </VBox>
+        <VBox spacing="6">
+            <Label text="Target Industry" styleClass="hint"/>
+            <TextField fx:id="targetIndustryField" promptText="e.g. Healthcare, Fintech, SaaS"/>
+        </VBox>
+        <VBox spacing="6">
+            <Label text="Services Offered" styleClass="hint"/>
+            <TextArea fx:id="servicesArea" promptText="Core services and value proposition" prefRowCount="3" wrapText="true"/>
+        </VBox>
+
+        <Separator/>
+
+        <Label text="Outreach SMTP Configuration (Jakarta Mail)" styleClass="section-header"/>
+        <GridPane hgap="12" vgap="10">
+            <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                <Label text="SMTP Host" styleClass="hint"/>
+                <TextField fx:id="smtpHostField" promptText="smtp.example.com"/>
+            </VBox>
+            <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                <Label text="Port (465 or 587)" styleClass="hint"/>
+                <TextField fx:id="smtpPortField" promptText="587"/>
+            </VBox>
+            <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                <Label text="SMTP Username" styleClass="hint"/>
+                <TextField fx:id="smtpUsernameField" promptText="outreach@example.com"/>
+            </VBox>
+            <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                <Label text="SMTP Password" styleClass="hint"/>
+                <PasswordField fx:id="smtpPasswordField" promptText="••••••••"/>
+            </VBox>
+        </GridPane>
+
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Button text="Save Settings" onAction="#onSave" styleClass="primary-button"/>
+        </HBox>
+    </VBox>
 </VBox>
