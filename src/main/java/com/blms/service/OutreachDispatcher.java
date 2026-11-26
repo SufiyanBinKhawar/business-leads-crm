@@ -11,6 +11,9 @@ import java.util.List;
 /** D5 Figure 3 «Pure Fabrication» OutreachDispatcher (+sender EmailSender). */
 public class OutreachDispatcher {
 
+    /** Prefix JakartaMailSender uses for the UC11 "Invalid recipient email" extension. */
+    private static final String INVALID_RECIPIENT = "Invalid recipient";
+
     private final EmailSender sender;
 
     public OutreachDispatcher(EmailSender sender) {
@@ -20,7 +23,8 @@ public class OutreachDispatcher {
     /**
      * SD11 steps 10-17. Returns sentCount.
      * UC11 extension "invalid recipient": recorded as a FAILED attempt with the error, draft stays APPROVED.
-     * UC11 extension "SMTP authentication error": IntegrationException propagates and aborts the batch.
+     * UC11 extension "SMTP authentication error" (or an unreachable server): IntegrationException propagates and
+     * aborts the batch; drafts already sent keep their SENT status (the controller saves them).
      * @param smtp DECRYPTED credentials (decrypted by OutreachController - CONFLICTS.md gap G2)
      */
     public int dispatch(List<EmailDraft> drafts, SmtpCredentials smtp) {
@@ -33,8 +37,8 @@ public class OutreachDispatcher {
                 d.recordDispatch("SENT");
                 sent++;
             } catch (IntegrationException e) {
-                if (e.getMessage() != null && e.getMessage().startsWith("SMTP authentication")) {
-                    throw e;
+                if (e.getMessage() == null || !e.getMessage().startsWith(INVALID_RECIPIENT)) {
+                    throw e;            // SMTP authentication error / server unreachable: abort the whole send
                 }
                 OutreachDispatch failed = d.recordDispatch("FAILED");
                 failed.setErrorMessage(e.getMessage());

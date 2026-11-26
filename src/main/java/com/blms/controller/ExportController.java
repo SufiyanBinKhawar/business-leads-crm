@@ -1,7 +1,9 @@
 package com.blms.controller;
 
+import com.blms.domain.Lead;
 import com.blms.domain.PipelineStatus;
 import com.blms.dto.ExportCriteria;
+import com.blms.exception.ValidationException;
 import com.blms.integration.export.Exporter;
 import com.blms.persistence.LeadRepository;
 
@@ -39,8 +41,15 @@ public class ExportController {
      * empty") (UC12 extension, no file created); pendingRows = exporter.format(found).
      */
     public void requestExport(ExportCriteria criteria) {
-        // TODO(Sufiyan, UC12)
-        throw new UnsupportedOperationException("TODO UC12 requestExport");
+        if (criteria == null) {
+            throw new ValidationException("Choose what to export");
+        }
+        List<Lead> found = leads.findByFilter(criteria.toFilter());           // SD12 steps 4-5
+        if (found.isEmpty()) {                                                 // UC12 extension: no file created
+            pendingRows = List.of();
+            throw new ValidationException("No records match \"" + criteria.label() + "\" - the export is empty");
+        }
+        pendingRows = exporter.format(found);                                  // SD12 steps 6-8
     }
 
     /**
@@ -48,7 +57,10 @@ public class ExportController {
      * exporter.write(pendingRows, filePath); return number of data rows (header excluded).
      */
     public int chooseDestination(String filePath) {
-        // TODO(Sufiyan, UC12)
-        throw new UnsupportedOperationException("TODO UC12 chooseDestination");
+        if (pendingRows.isEmpty()) {
+            throw new ValidationException("Choose the export criteria first");
+        }
+        exporter.write(pendingRows, filePath);     // SD12 step 11 (write denied -> UC12 extension, rows kept for retry)
+        return pendingRows.size() - 1;             // SD12 step 12 exportedCount (header excluded)
     }
 }
