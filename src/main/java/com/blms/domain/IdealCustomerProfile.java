@@ -27,9 +27,11 @@ public class IdealCustomerProfile {
 
     /** SD05 steps 11-12: the ICP builds its own search query (Information Expert). */
     public String toSearchQuery() {
-        String keywords = criteria == null ? "" : criteria.replaceFirst("^services=", "");
-        return "industry=" + URLEncoder.encode(targetIndustry == null ? "" : targetIndustry, StandardCharsets.UTF_8)
-                + "&keywords=" + URLEncoder.encode(keywords, StandardCharsets.UTF_8);
+        // Apollo People API Search parameters (CONFLICTS.md I-002). The target industry goes in q_keywords, a free-text
+        // match. Apollo's organization_industries[] filter only accepts its own exact lowercase names, so a typed
+        // industry such as "Fintech" would return nothing. per_page 10 = one enrichment call (<= 10 credits) per run.
+        return "q_keywords=" + URLEncoder.encode(targetIndustry == null ? "" : targetIndustry.trim(), StandardCharsets.UTF_8)
+                + "&per_page=10&page=1";
     }
 
     public Long getIcpId() { return icpId; }

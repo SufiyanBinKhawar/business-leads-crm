@@ -71,6 +71,76 @@ Other fixed decisions (from the deliverables, not gaps):
 
 <!-- Ismail: append below this line, newest at the bottom. -->
 
+### I-001 · OWNERSHIP-EXCEPTION · Status: DONE
+- **Date:** 2026-11-28
+- **Raised by:** Ismail
+- **Files:** none (sign-off record only)
+- **Problem:** S-004, S-005 and S-006 record my agreement as "verbal ... GitHub confirmation to follow".
+- **Proposal:** this entry is that written confirmation.
+- **Diagram impact:** S-004 only (Fig. 1 / G8, already noted by Sufiyan).
+- **Agreed by:** Ismail (2026-11-28) confirms S-004 (CONTRACT-CHANGE `addLoadedDraft` / `addLoadedAttempt`),
+  S-005 (`docs/DEMO_NOTES_SUFIYAN.md`) and S-006 (UI completion, PR #9).
+- **Resolution:** I add `docs/DEMO_NOTES_ISMAIL.md` under the permission given in S-005.
+
+### I-002 · DESIGN-DEVIATION · Status: OPEN (for Sufiyan: owner of `integration/source/**`, `domain/**`)
+- **Date:** 2026-11-28
+- **Raised by:** Ismail
+- **Files:** src/main/java/com/blms/integration/source/B2BApiLeadSource.java,
+  src/main/java/com/blms/domain/IdealCustomerProfile.java (`toSearchQuery`)
+- **Problem:** we want to present UC05 against the real Apollo API. Apollo's docs (docs.apollo.io, People API
+  Search, read 2026-11-28) say the call that works for an API key is **`POST /api/v1/mixed_people/api_search`**
+  with header `x-api-key`, query parameters `q_keywords`, `organization_industries[]` (lowercase Apollo industry
+  names), `person_titles[]`, `page` and `per_page`. Our code sends **GET `/mixed_people/search`** with `industry=` and
+  `keywords=`, which Apollo doesn't recognise. Worse, the docs state that search "doesn't return email addresses
+  or phone numbers" (the last name is obfuscated as well). So even a successful call gives rows with no email. They are all
+  counted `invalid`, and live UC05 always imports **0 leads**. Offline mode (G12) is unaffected.
+- **Proposal (smallest change, no public API change):**
+  1. `B2BApiLeadSource`: default endpoint → `https://api.apollo.io/api/v1/mixed_people/api_search`, private `get(...)`
+     → POST with an empty body (`BodyPublishers.noBody()`), keep the `x-api-key` header.
+  2. `IdealCustomerProfile.toSearchQuery()` returns
+     `q_keywords=<services>&organization_industries[]=<industry lowercased>&per_page=10&page=1`, all URL-encoded.
+  3. To get emails: after the search, one private call to Apollo **bulk people enrichment**
+     (`POST /api/v1/people/bulk_match`, up to 10 `id`s, 1 credit per email revealed), mapping `email`,
+     `last_name` and `organization.phone`. Then the D3 "missing fields become null" rule still applies.
+  4. Update `B2BApiLeadSourceTest` to the new request shape.
+- **Diagram impact:** D5 SD05 steps 13-14 say "HTTP GET /people/search(query)". Redraw as "HTTP POST
+  /mixed_people/api_search(query)" plus an enrichment self-call inside `B2BApiLeadSource` (Adapter, still one
+  `fetchLeads()` from the caller's point of view). No class, method or association changes.
+- **Agreed by:** Ismail (2026-11-28)
+- **Resolution:** waiting for Sufiyan. If not signed before code freeze, UC05 is presented in offline mode (G12),
+  and the other live services (OpenAI UC09, Gmail SMTP UC11) are unaffected.
+- **Follow-up (2026-11-28, Ismail):** Sufiyan approved I-002 and I-003 and told Ismail so; recorded by Ismail, GitHub
+  confirmation on the PR to follow (same practice as S-004..S-006). **Agreed by:** Ismail (2026-11-28),
+  Sufiyan (2026-11-28 - approval given to Ismail, recorded by Ismail; GitHub confirmation to follow). Status → DONE.
+  Implemented on `ui/final-polish`:
+  - `B2BApiLeadSource`: POST `/api/v1/mixed_people/api_search`; then private POST `/api/v1/people/bulk_match`
+    (batches of 10, `reveal_personal_emails=false&reveal_phone_number=false`). An unmatched (`null`) entry keeps the
+    search data and has no email, so it is reported invalid. People who already have an email are not enriched.
+    403 message names the two endpoints a scoped key needs.
+  - `IdealCustomerProfile.toSearchQuery()` → `q_keywords=<target industry>&per_page=10&page=1`. **Change from
+    the proposal:** no `organization_industries[]`, because it only accepts Apollo's exact lowercase industry names
+    and a typed industry like "Fintech" would return nothing. per_page 10 = at most 10 credits per run.
+  - `LeadIngestionController.OPERATION` (ApiCallLog text) → `POST /mixed_people/api_search + /people/bulk_match`.
+  - Tests: `B2BApiLeadSourceTest` rewritten against a local fake Apollo (search, enrichment, batching, 429, 401/403,
+    garbage, network); `WorkspaceControllerTest`, `LeadIngestionControllerTest` expected strings updated.
+  - `docs/DESIGN_TRACEABILITY.md` UC05 row updated. **Redraw D5 SD05 steps 13-14** (POST + enrichment inside the
+    adapter). No class, public method, attribute or association changed, so `scripts/d5-contract.txt` is unchanged.
+  - Sufiyan: `docs/DEMO_NOTES_SUFIYAN.md` lines 92 and 94 still say "GET /people/search". Please update your file.
+
+### I-003 · OWNERSHIP-EXCEPTION · Status: DONE
+- **Date:** 2026-11-28
+- **Raised by:** Ismail
+- **Files (Sufiyan's):** src/main/java/com/blms/integration/source/B2BApiLeadSource.java,
+  src/main/java/com/blms/domain/IdealCustomerProfile.java, src/main/java/com/blms/controller/LeadIngestionController.java
+  (one constant), src/test/java/com/blms/integration/source/B2BApiLeadSourceTest.java,
+  src/test/java/com/blms/controller/WorkspaceControllerTest.java, src/test/java/com/blms/controller/LeadIngestionControllerTest.java;
+  shared: docs/DESIGN_TRACEABILITY.md (UC05 row).
+- **Problem:** I-002 must be in before code freeze for a live-API demo, and Sufiyan asked Ismail to apply it.
+- **Proposal:** Ismail edits exactly those files for I-002 on `ui/final-polish`; Sufiyan reviews the PR.
+- **Diagram impact:** as I-002 (SD05).
+- **Agreed by:** Ismail (2026-11-28), Sufiyan (2026-11-28 - approval given to Ismail, recorded by Ismail; GitHub confirmation to follow)
+- **Resolution:** same branch and PR as I-002.
+
 ---
 
 ## §B — Sufiyan's entries

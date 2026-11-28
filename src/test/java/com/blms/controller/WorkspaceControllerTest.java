@@ -105,6 +105,6 @@ class WorkspaceControllerTest {
                 new SmtpCredentials("smtp.acme.example", 465, "u@acme.example", "pw"));
         String q = workspace.getIcp().toSearchQuery();
         assertNotNull(q);
-        assertEquals("industry=Health+Tech&keywords=AI+%26+data", q);
+        assertEquals("q_keywords=Health+Tech&per_page=10&page=1", q);
     }
 }
