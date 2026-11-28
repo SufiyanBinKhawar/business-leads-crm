@@ -44,7 +44,7 @@
                 <TextField fx:id="smtpUsernameField" promptText="outreach@example.com"/>
             </VBox>
             <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                <Label text="SMTP Password" styleClass="hint"/>
+                <Label text="SMTP Password (re-enter on every save; Gmail: App Password)" styleClass="hint"/>
                 <PasswordField fx:id="smtpPasswordField" promptText="••••••••"/>
             </VBox>
         </GridPane>

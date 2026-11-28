@@ -13,6 +13,8 @@ import com.blms.ui.util.AlertHelper;
 import com.blms.ui.util.FxAsync;
 import com.blms.exception.BlmsException;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -58,6 +60,8 @@ public class LeadsViewController {
 
     private LeadController leadController;
     private OutreachController outreachController;
+    /** True while a UC09/UC11 background job runs: blocks a second click (no duplicate generation or sending). */
+    private final BooleanProperty batchRunning = new SimpleBooleanProperty(false);
 
     @FXML
     private void initialize() {
@@ -190,9 +194,9 @@ public class LeadsViewController {
         // Edit enabled only when exactly 1 row is selected
         editLeadButton.disableProperty().bind(Bindings.size(selected).isNotEqualTo(1));
 
-        // Generate / Send enabled only when 1+ rows are selected
-        generateDraftsButton.disableProperty().bind(Bindings.isEmpty(selected));
-        sendEmailsButton.disableProperty().bind(Bindings.isEmpty(selected));
+        // Generate / Send enabled only when 1+ rows are selected and no batch job is already running
+        generateDraftsButton.disableProperty().bind(Bindings.isEmpty(selected).or(batchRunning));
+        sendEmailsButton.disableProperty().bind(Bindings.isEmpty(selected).or(batchRunning));
 
         selected.addListener((ListChangeListener<Lead>) c -> {
             int size = selected.size();
@@ -312,6 +316,7 @@ public class LeadsViewController {
         try {
             Long jobId = outreachController.generateDrafts(ids);
             loadingIndicator.visibleProperty().unbind();
+            batchRunning.set(true);
             generateDraftsButton.setText("Generating...");
             loadingIndicator.setVisible(true);
             FxAsync.onComplete(jobId, () -> {
@@ -345,6 +350,7 @@ public class LeadsViewController {
         try {
             Long jobId = outreachController.sendApprovedEmails(ids);
             loadingIndicator.visibleProperty().unbind();
+            batchRunning.set(true);
             sendEmailsButton.setText("Sending...");
             loadingIndicator.setVisible(true);
             FxAsync.onComplete(jobId, () -> {
@@ -369,6 +375,7 @@ public class LeadsViewController {
     }
 
     private void resetBatchUi() {
+        batchRunning.set(false);
         generateDraftsButton.setText("Generate Drafts");
         sendEmailsButton.setText("Send Emails");
         loadingIndicator.setVisible(false);
