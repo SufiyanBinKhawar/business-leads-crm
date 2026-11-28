@@ -109,6 +109,37 @@ Other fixed decisions (from the deliverables, not gaps):
 - **Agreed by:** Ismail (2026-11-28)
 - **Resolution:** waiting for Sufiyan. If not signed before code freeze, UC05 is presented in offline mode (G12),
   and the other live services (OpenAI UC09, Gmail SMTP UC11) are unaffected.
+- **Follow-up (2026-11-28, Ismail):** Sufiyan approved I-002 and I-003 and told Ismail so; recorded by Ismail, GitHub
+  confirmation on the PR to follow (same practice as S-004..S-006). **Agreed by:** Ismail (2026-11-28),
+  Sufiyan (2026-11-28 - approval given to Ismail, recorded by Ismail; GitHub confirmation to follow). Status → DONE.
+  Implemented on `ui/final-polish`:
+  - `B2BApiLeadSource`: POST `/api/v1/mixed_people/api_search`; then private POST `/api/v1/people/bulk_match`
+    (batches of 10, `reveal_personal_emails=false&reveal_phone_number=false`). An unmatched (`null`) entry keeps the
+    search data and has no email, so it is reported invalid. People who already have an email are not enriched.
+    403 message names the two endpoints a scoped key needs.
+  - `IdealCustomerProfile.toSearchQuery()` → `q_keywords=<target industry>&per_page=10&page=1`. **Change from
+    the proposal:** no `organization_industries[]`, because it only accepts Apollo's exact lowercase industry names
+    and a typed industry like "Fintech" would return nothing. per_page 10 = at most 10 credits per run.
+  - `LeadIngestionController.OPERATION` (ApiCallLog text) → `POST /mixed_people/api_search + /people/bulk_match`.
+  - Tests: `B2BApiLeadSourceTest` rewritten against a local fake Apollo (search, enrichment, batching, 429, 401/403,
+    garbage, network); `WorkspaceControllerTest`, `LeadIngestionControllerTest` expected strings updated.
+  - `docs/DESIGN_TRACEABILITY.md` UC05 row updated. **Redraw D5 SD05 steps 13-14** (POST + enrichment inside the
+    adapter). No class, public method, attribute or association changed, so `scripts/d5-contract.txt` is unchanged.
+  - Sufiyan: `docs/DEMO_NOTES_SUFIYAN.md` lines 92 and 94 still say "GET /people/search". Please update your file.
+
+### I-003 · OWNERSHIP-EXCEPTION · Status: DONE
+- **Date:** 2026-11-28
+- **Raised by:** Ismail
+- **Files (Sufiyan's):** src/main/java/com/blms/integration/source/B2BApiLeadSource.java,
+  src/main/java/com/blms/domain/IdealCustomerProfile.java, src/main/java/com/blms/controller/LeadIngestionController.java
+  (one constant), src/test/java/com/blms/integration/source/B2BApiLeadSourceTest.java,
+  src/test/java/com/blms/controller/WorkspaceControllerTest.java, src/test/java/com/blms/controller/LeadIngestionControllerTest.java;
+  shared: docs/DESIGN_TRACEABILITY.md (UC05 row).
+- **Problem:** I-002 must be in before code freeze for a live-API demo, and Sufiyan asked Ismail to apply it.
+- **Proposal:** Ismail edits exactly those files for I-002 on `ui/final-polish`; Sufiyan reviews the PR.
+- **Diagram impact:** as I-002 (SD05).
+- **Agreed by:** Ismail (2026-11-28), Sufiyan (2026-11-28 - approval given to Ismail, recorded by Ismail; GitHub confirmation to follow)
+- **Resolution:** same branch and PR as I-002.
 
 ---
 

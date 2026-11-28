@@ -154,7 +154,7 @@ class LeadIngestionControllerTest {
         assertEquals(1, s.invalid());         // Quanta Retail has no contact name (null-safe JSON)
         ApiCallLog log = workspace.getApiLogs().get(0);
         assertEquals(200, log.getStatusCode());
-        assertEquals("GET /people/search", log.getOperation());
+        assertEquals("POST /mixed_people/api_search + /people/bulk_match", log.getOperation());
         assertEquals(1, workspaces.saves);    // gap G4: the log is persisted
     }
 

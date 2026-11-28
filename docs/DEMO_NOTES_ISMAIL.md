@@ -52,15 +52,16 @@ b2b.apiKey=...               # Apollo.io (UC05) - read 1.2 first
 | Cost | A batch of 10 drafts costs a fraction of a cent. |
 | Test | Qualify a lead (UC08), select it in Leads, click **Generate Drafts** → "1 draft(s) generated" → open the lead → the draft is a real personalised email, not the fixed template. |
 
-### 1.2 Apollo.io: UC05 Discover Leads via B2B API. **Does not work live yet; see CONFLICTS.md I-002.**
+### 1.2 Apollo.io: UC05 Discover Leads via B2B API. **Fixed (CONFLICTS.md I-002 / I-003); not yet tested against the real Apollo.**
 | Step | What to do |
 |---|---|
 | Account | Sign up at **apollo.io** with a **work/university email** (Apollo says free API access needs a work-email account). |
-| Key | *Settings → Integrations → API Keys → Create new key*. Tick the **People API Search** and **Bulk People Enrichment** endpoints (or "Set as master key"). Paste into `b2b.apiKey`. |
-| Credits | Search is free (0 credits); revealing an email costs 1 credit per person. |
-| **Problem** | Our `B2BApiLeadSource` sends `GET /mixed_people/search?industry=..&keywords=..`. Apollo documents `POST /mixed_people/api_search` with `q_keywords` / `organization_industries[]`. Apollo's search also **never returns emails**, so every row is "invalid" and live discovery imports **0 leads**. The fix belongs to Sufiyan (his files); I logged it as **I-002** with the exact change. |
-| Until fixed | Leave `b2b.apiKey` **blank**: discovery returns 3 sample prospects (G12) and the rest of the demo is live. Say so honestly if asked. |
-| After the fix | Set the workspace's Target Industry to a lowercase Apollo industry name, e.g. `information technology & services`. Don't send UC11 emails to the real people Apollo finds; use your own addresses for UC11. |
+| Key | *Settings → Integrations → API Keys → Create new key*. Tick **People API Search** AND **Bulk People Enrichment** (or "Set as master key"). Paste into `b2b.apiKey`. A key missing an endpoint gives "rejected the API key (HTTP 403)". |
+| How it works | `B2BApiLeadSource.fetchLeads`: (1) `POST /api/v1/mixed_people/api_search?q_keywords=<Target Industry>&per_page=10&page=1` (0 credits, no emails), (2) `POST /api/v1/people/bulk_match` with those 10 ids → emails, last names, company industry/phone. Still ONE `fetchLeads()` for the caller (Adapter). |
+| Credits | Search is free; enrichment costs 1 credit per person whose email is revealed, so at most **10 credits per discovery run**. Check your credit balance in Apollo before the demo. People Apollo can't match come back without an email and are counted as "skipped (missing contact data)". |
+| Target Industry | It's sent as free-text keywords, so `Fintech`, `SaaS`, `Healthcare` all work. |
+| Rehearse | Run discovery once the day before: expect "N new lead(s) saved, M already in the CRM, K skipped". If it says 0 saved and all skipped, your plan has no email credits left. |
+| Caution | These are **real people**. Do not send UC11 emails to them; use your own addresses for UC11. |
 
 ### 1.3 Gmail SMTP: UC11 Dispatch Automated Outreach. **Works live as the code is now.**
 SMTP is **not** in `local.properties`. It is entered in the app in **Workspace Settings (UC02, admin only)** and

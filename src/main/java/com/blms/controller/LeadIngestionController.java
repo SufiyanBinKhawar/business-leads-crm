@@ -36,7 +36,7 @@ public class LeadIngestionController {
     private volatile ImportSummary lastImportSummary;
 
     private static final String PROVIDER = "Apollo";
-    private static final String OPERATION = "GET /people/search";
+    private static final String OPERATION = "POST /mixed_people/api_search + /people/bulk_match";
     private static final Pattern HTTP_STATUS = Pattern.compile("HTTP (\\d{3})");
 
     public LeadIngestionController(BackgroundTaskRunner runner, Workspace workspace, LeadImportService importer,
@@ -84,7 +84,7 @@ public class LeadIngestionController {
 
     /**
      * SD05 steps 8-25 (background thread): lastImportSummary = importer.importFrom(source, workspace);
-     * workspace.logApiCall("Apollo", "GET /people/search", 200, null); workspaces.save(workspace).
+     * workspace.logApiCall("Apollo", OPERATION, 200, null); workspaces.save(workspace).
      * On IntegrationException: logApiCall with the error code/message, save, rethrow (UC05 extensions).
      */
     private void runDiscovery(LeadSource source) {
